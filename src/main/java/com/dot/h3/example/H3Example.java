@@ -125,6 +125,15 @@ public class H3Example {
 				System.out.println("Output " + i + ": " + krd.get(i));
 			}
 			
+			String KringDistanxtStr = wkt.KringLongIndexToMultiPolygon(krd, h3);
+			System.out.println(KringDistanxtStr);
+			// SELECT H3ToGeoWkt(631243922056054783) AS wkt;
+			
+			//SELECT H3ToString(631243922056054783);
+			String KRingDistanceIndex2 = "8c2a100acc687ff";
+			List<List<String>> krd2 = h3.kRingDistances(KRingDistanceIndex2, 3);
+			KringDistanxtStr = wkt.KringStringndexToMultiPolygon(krd2, h3);
+			System.out.println(KringDistanxtStr);
 			
 		} catch (IOException e) {
 				

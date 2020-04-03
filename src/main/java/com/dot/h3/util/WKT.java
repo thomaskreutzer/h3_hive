@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.uber.h3core.util.GeoCoord;
+import com.uber.h3core.H3Core;
 
 public class WKT {
 	
@@ -79,6 +80,78 @@ public class WKT {
 			lgc.add(wktPolygonToGeoCoord(wkt));
 		}
 		return lgc;
+	}
+	
+	public String KringLongIndexToMultiPolygon(List<List<Long>> l, H3Core h3) {
+		StringBuilder wkt = new StringBuilder();
+		String repeatVal = "";
+		wkt.append("MULTIPOLYGON(");
+		for (int i = 0; i < l.size(); i++) {
+			if(i>0){
+				wkt.append(",");
+			}
+			//For each set of items we must append a set of brackets
+			wkt.append("((");
+			
+			List<Long> indicies = l.get(i);
+			for (int x = 0; x < indicies.size(); x++) {
+				if(x>0){
+					wkt.append(",");
+				}
+				GeoCoord gc = h3.h3ToGeo( indicies.get(x) );
+				String lngLat = gc.lng + " " + gc.lat;
+				wkt.append(lngLat);
+				if(i>0 && x==0){
+					repeatVal = lngLat;
+				}
+				
+				//If this is the last in the inner loop and not the first loop append the final closer...
+				if(x==indicies.size()-1 && i>0) {
+					wkt.append("," + repeatVal);
+				}
+			}
+			//Close out the brackets
+			wkt.append("))");
+		}
+		//Close out MULTIPOLYGON
+		wkt.append(")");
+		return wkt.toString();
+	}
+	
+	public String KringStringndexToMultiPolygon(List<List<String>> l, H3Core h3) {
+		StringBuilder wkt = new StringBuilder();
+		String repeatVal = "";
+		wkt.append("MULTIPOLYGON(");
+		for (int i = 0; i < l.size(); i++) {
+			if(i>0){
+				wkt.append(",");
+			}
+			//For each set of items we must append a set of brackets
+			wkt.append("((");
+			
+			List<String> indicies = l.get(i);
+			for (int x = 0; x < indicies.size(); x++) {
+				if(x>0){
+					wkt.append(",");
+				}
+				GeoCoord gc = h3.h3ToGeo( indicies.get(x) );
+				String lngLat = gc.lng + " " + gc.lat;
+				wkt.append(lngLat);
+				if(i>0 && x==0){
+					repeatVal = lngLat;
+				}
+				
+				//If this is the last in the inner loop and not the first loop append the final closer...
+				if(x==indicies.size()-1 && i>0) {
+					wkt.append("," + repeatVal);
+				}
+			}
+			//Close out the brackets
+			wkt.append("))");
+		}
+		//Close out MULTIPOLYGON
+		wkt.append(")");
+		return wkt.toString();
 	}
 	
 	
