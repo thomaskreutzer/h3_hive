@@ -20,7 +20,7 @@ import com.uber.h3core.util.GeoCoord;
 import org.apache.hadoop.io.Text;
 
 @Description(name = "LatLongH3ToGeoBoundryWkt",
-value = "_FUNC_(lat double, long double, resolution integer) - returns a WKT",
+value = "_FUNC_(double lat, double long, integer resolution) - returns a WKT",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
 + "  > SELECT _FUNC_(40.86016, -73.90071, 12);\n"

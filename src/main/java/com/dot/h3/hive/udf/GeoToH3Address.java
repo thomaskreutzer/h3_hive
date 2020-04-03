@@ -17,7 +17,7 @@ import org.apache.hadoop.io.Text;
 
 
 @Description(name = "GeoToH3Address",
-value = "_FUNC_(lat double, long double, resolution integer) - returns a String of the H3 index",
+value = "_FUNC_(double lat, double long, integer resolution) - returns a String of the H3 index",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
 + "  > SELECT _FUNC_(40.86016, -73.90071, 12);\n"

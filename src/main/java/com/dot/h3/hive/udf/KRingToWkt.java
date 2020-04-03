@@ -23,8 +23,8 @@ import com.uber.h3core.H3Core;
 
 
 @Description(name = "KRingToWkt",
-value = "_FUNC_(index long, resolution integer) - returns WKT of Parent\n "
-+ "_FUNC_(index string, resolution integer) - returns WKT of Parent",
+value = "_FUNC_(long index, integer resolution) - returns WKT of Parent\n "
++ "_FUNC_(string index, integer resolution) - returns WKT of Parent",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
 + "  > CREATE TEMPORARY FUNCTION KRingToWkt AS 'com.dot.h3.hive.udf.KRingToWkt';\n"

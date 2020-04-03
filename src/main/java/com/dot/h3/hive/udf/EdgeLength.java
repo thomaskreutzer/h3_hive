@@ -16,7 +16,7 @@ import com.uber.h3core.H3Core;
 import com.uber.h3core.LengthUnit;
 
 @Description(name = "GeoToH3",
-value = "_FUNC_(resolution integer, lengthUnit string) - returns a double of the unit",
+value = "_FUNC_(integer resolution, string lengthUnit) - returns a double of the unit",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
 + "  > SELECT _FUNC_(12, 'm') AS edge_meters;\n"

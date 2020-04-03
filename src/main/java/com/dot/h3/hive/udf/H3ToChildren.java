@@ -18,12 +18,11 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 
 import com.dot.h3.exceptions.H3InstantiationException;
-import com.dot.h3.util.WKT;
 import com.uber.h3core.H3Core;
 
 @Description(name = "H3ToChildren",
-value = "_FUNC_(index long, resolution integer) - returns long of Children\n "
-+ "_FUNC_(index string, resolution integer) - returns string of Children",
+value = "_FUNC_(long index, integer resolution) - returns long of Children\n "
++ "_FUNC_(string index, integer resolution) - returns string of Children",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
 + "  > CREATE TEMPORARY FUNCTION H3ToChildren AS 'com.dot.h3.hive.udf.H3ToChildren';\n"
@@ -51,10 +50,8 @@ public class H3ToChildren extends GenericUDF {
 	PrimitiveObjectInspector inputOI0;
 	PrimitiveObjectInspector inputOI1;
 	H3Core h3;
-	WKT wkt;
 	
 	public H3ToChildren() throws H3InstantiationException {
-		wkt = new WKT();
 		try {
 			h3 = H3Core.newInstance();
 		} catch (IOException e) {

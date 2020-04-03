@@ -1,5 +1,7 @@
 com\dot\h3\hive\udf\GeoToH3.class
+com\dot\h3\hive\udf\H3ToCenterChildWkt.class
 com\dot\h3\hive\udf\H3ToGeoWkt.class
+com\dot\h3\hive\udf\H3ToCenterChild.class
 com\dot\h3\hive\udf\H3ToChildren.class
 com\dot\h3\hive\udf\H3ToString.class
 com\dot\h3\hive\udf\PolyfillToArrayWkt.class

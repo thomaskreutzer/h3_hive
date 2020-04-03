@@ -21,7 +21,7 @@ import com.uber.h3core.util.GeoCoord;
 import org.apache.hadoop.io.Text;
 
 @Description(name = "PolyfillToArrayWkt",
-value = "_FUNC_(plygon_wkt string, holes_poly_multipoly string, resolution integer) - returns an array of points as WKT",
+value = "_FUNC_(string plygon_wkt, string holes_poly_multipoly, integer resolution) - returns an array of points as WKT",
 extended = "Returns NULL if polygon_wkt or resultion arguments are NULL.\n"
 
 + "Example:\n"

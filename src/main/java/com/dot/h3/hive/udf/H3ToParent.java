@@ -18,8 +18,8 @@ import com.dot.h3.exceptions.H3InstantiationException;
 import com.uber.h3core.H3Core;
 
 @Description(name = "H3ToParent",
-value = "_FUNC_(index long, resolution integer) - returns long of Parent\n "
-+ "_FUNC_(index string, resolution integer) - returns string of Parent",
+value = "_FUNC_(long index, integer resolution) - returns long of Parent\n "
++ "_FUNC_(string index, integer resolution) - returns string of Parent",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
 + "  > CREATE TEMPORARY FUNCTION H3ToParent AS 'com.dot.h3.hive.udf.H3ToParent';\n"

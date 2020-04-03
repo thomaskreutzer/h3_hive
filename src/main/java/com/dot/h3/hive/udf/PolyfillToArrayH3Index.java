@@ -21,7 +21,7 @@ import com.uber.h3core.util.GeoCoord;
 import org.apache.hadoop.io.Text;
 
 @Description(name = "PolyfillToArrayH3Index",
-value = "_FUNC_(plygon_wkt string, holes_poly_multipoly string, resolution integer) - returns a string array of H3 Index's\n",
+value = "_FUNC_(string plygon_wkt, string holes_poly_multipoly, integer resolution) - returns a string array of H3 Index's\n",
 extended = "Returns NULL if polygon_wkt or resultion arguments are NULL.\n"
 
 + "Example:\n"

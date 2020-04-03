@@ -17,7 +17,7 @@ import com.uber.h3core.H3Core;
 import org.apache.hadoop.io.Text;
 
 @Description(name = "H3ToGeoWkt",
-value = "_FUNC_(index long) - returns WKT POINT of the lat/long",
+value = "_FUNC_(long index) - returns WKT POINT of the lat/long",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
 + "  > SELECT _FUNC_(631243922056054783);\n"

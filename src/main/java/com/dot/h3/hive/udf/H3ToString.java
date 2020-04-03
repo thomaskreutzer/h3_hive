@@ -16,10 +16,11 @@ import com.uber.h3core.H3Core;
 import org.apache.hadoop.io.Text;
 
 @Description(name = "H3ToString",
-value = "_FUNC_(index long) - returns H3 String",
+value = "_FUNC_(long index) - returns H3 String",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
-+ "  > SELECT _FUNC_(631243922056054783);\n"
++ "  > CREATE TEMPORARY FUNCTION H3ToString AS 'com.dot.h3.hive.udf.H3ToString';"
++ "  > SELECT H3ToString(631243922056054783);\n"
 + "  > 8c2a100acc687ff\n")
 
 

@@ -22,8 +22,8 @@ import com.uber.h3core.H3Core;
 import org.apache.hadoop.io.Text;
 
 @Description(name = "H3ToChildrenWkt",
-value = "_FUNC_(index long, resolution integer) - returns long of Children\n "
-+ "_FUNC_(index string, resolution integer) - returns string of Children",
+value = "_FUNC_(long index, integer resolution) - returns long of Children\n "
++ "_FUNC_(string index, integer resolution) - returns string of Children",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
 + "  > CREATE TEMPORARY FUNCTION H3ToChildrenWkt AS 'com.dot.h3.hive.udf.H3ToChildrenWkt';\n"
