@@ -71,7 +71,7 @@ public class H3ToCenterChildWkt extends GenericUDF {
 		if (! ( (inputOI0 instanceof StringObjectInspector)
 				|| (inputOI0 instanceof LongObjectInspector) )
 			) {
-			throw new UDFArgumentException("Currently only string and long can be passed into H3ToChildren for the first parameter.\n" 
+			throw new UDFArgumentException("Currently only string and long can be passed into H3ToCenterChildWkt for the first parameter.\n" 
 					+ "The type passed in to argument 0 is " + inputOI0.getPrimitiveCategory().name() + "\n"
 					+ "The type passed in to argument 1 is " + inputOI1.getPrimitiveCategory().name());
 		}
