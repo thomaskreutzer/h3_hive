@@ -118,6 +118,14 @@ public class H3Example {
 			System.out.println("Kring from Long:\n" + kringL.toString());
 			
 			
+			Long KRingDistanceIndex = 631243922056054783L;
+			List<List<Long>> krd = h3.kRingDistances(KRingDistanceIndex, 3);
+			System.out.println("KRingDistance Output: ");
+			for (int i = 0; i < krd.size(); i++) {
+				System.out.println("Output " + i + ": " + krd.get(i));
+			}
+			
+			
 		} catch (IOException e) {
 				
 		}
