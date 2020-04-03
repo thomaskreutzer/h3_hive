@@ -1,55 +1,56 @@
 package com.dot.h3.hive.udf;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.LongObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.io.Text;
 
 import com.dot.h3.exceptions.H3InstantiationException;
 import com.dot.h3.util.WKT;
 import com.uber.h3core.H3Core;
+import com.uber.h3core.util.GeoCoord;
 
-import org.apache.hadoop.io.Text;
-
-@Description(name = "H3ToGeoWkt",
-value = "_FUNC_(long index) - returns WKT POINT of the lat/long"
-+"_FUNC_(string index) - returns WKT POINT of the lat/long",
+@Description(name = "H3ToGeoBoundryWkt",
+value = "_FUNC_(long index) - returns WKT Polygon\n"
++ "_FUNC_(string index) - returns WKT Polygon\\",
 extended = "Returns NULL if any argument is NULL.\n"
-		+ "Example:\n"
-		+ "  > CREATE TEMPORARY FUNCTION H3ToGeoWkt AS 'com.dot.h3.hive.udf.H3ToGeoWkt';\n"
-		+ "  > SELECT H3ToGeoWkt(61773312317403955) AS wkt;\n"
-		+ "  > +------------------------------------------------+\n"
-		+ "  > |                      wkt                       |\n"
-		+ "  > +------------------------------------------------+\n"
-		+ "  > | POINT(-105.89054624819013 -30.32377110841559)  |\n"
-		+ "  > +------------------------------------------------+\n\n"
++ "Example:\n"
++ "  > CREATE TEMPORARY FUNCTION H3ToGeoBoundryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundryWkt';\n"
++ "  > SELECT H3ToGeoBoundryWkt(61773312317403955) AS wkt;\n"
++ "  > +----------------------------------------------------+\n"
++ "  > |                        wkt                         |\n"
++ "  > +----------------------------------------------------+\n"
++ "  > | POLYGON((-105.89053610304362 -30.323807809188516,  |\n"
++ "  > +----------------------------------------------------+\n\n"
 
-		+ "Example 2:\n"
-		+ "  > CREATE TEMPORARY FUNCTION H3ToGeoWkt AS 'com.dot.h3.hive.udf.H3ToGeoWkt';\n"
-		+ "  > SELECT H3ToGeoWkt('892a100acc7ffff') AS wkt;"
-		+ "  > +------------------------------------------------+\n"
-		+ "  > |                      wkt                       |\n"
-		+ "  > +------------------------------------------------+\n"
-		+ "  > | POINT(-105.89054624819013 -30.32377110841559)  |\n"
-		+ "  > +------------------------------------------------+\n\n")
-
-
++ "Example 2:\n"
++ "  > CREATE TEMPORARY FUNCTION H3ToGeoBoundryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundryWkt';\n"
++ "  > SELECT H3ToGeoBoundryWkt('892a100acc7ffff') AS wkt;"
++ "  > +----------------------------------------------------+\n"
++ "  > |                        wkt                         |\n"
++ "  > +----------------------------------------------------+\n"
++ "  > | POLYGON((-105.89053610304362 -30.323807809188516,  |\n"
++ "  > +----------------------------------------------------+\n\n")
 
 
-public class H3ToGeoWkt extends GenericUDF {
+
+
+public class H3ToGeoBoundryWkt extends GenericUDF {
 	private final Text strOut = new Text();
 	PrimitiveObjectInspector inputOI0;
 	H3Core h3;
 	WKT wkt;
 	
-	public H3ToGeoWkt() throws H3InstantiationException {
+	public H3ToGeoBoundryWkt() throws H3InstantiationException {
 		wkt = new WKT();
 		try {
 			h3 = H3Core.newInstance();
@@ -67,10 +68,9 @@ public class H3ToGeoWkt extends GenericUDF {
 		if (! ( (inputOI0 instanceof StringObjectInspector)
 				|| (inputOI0 instanceof LongObjectInspector) )
 			) {
-			throw new UDFArgumentException("Currently only string and long can be passed into H3ToGeoWkt for the argument.\n" 
+			throw new UDFArgumentException("Currently only string and long can be passed into H3ToGeoBoundryWkt for the argument.\n" 
 					+ "The type passed in to argument 0 is " + inputOI0.getPrimitiveCategory().name() );
 		}
-		
 		ObjectInspector outputOI = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
 		return outputOI;
 	}
@@ -78,19 +78,23 @@ public class H3ToGeoWkt extends GenericUDF {
 	@Override
 	public Object evaluate(DeferredObject[] arguments) throws HiveException {
 		Object arg0 = arguments[0].get(); //Index
+		String out;
 		if (arg0 == null) return null;
 		if(inputOI0.getPrimitiveCategory().name() == "STRING") {
 			String indexStr = (String) inputOI0.getPrimitiveJavaObject(arg0);
-			strOut.set( wkt.geoCoordToPointWkt( h3.h3ToGeo(indexStr) ) );
+			List<GeoCoord> gcoord = h3.h3ToGeoBoundary(indexStr);
+			out = wkt.geoCoordToPolygonWkt(gcoord);
 		} else {
 			Long index = (Long) inputOI0.getPrimitiveJavaObject(arg0);
-			strOut.set( wkt.geoCoordToPointWkt( h3.h3ToGeo(index) ) );
+			List<GeoCoord> gcoord = h3.h3ToGeoBoundary(index);
+			out = wkt.geoCoordToPolygonWkt(gcoord);
 		}
+		strOut.set( out );
 		return strOut;
 	}
 
 	@Override
 	public String getDisplayString(String[] children) {
-		return getStandardDisplayString("H3ToGeoWkt", children, ",");
+		return getStandardDisplayString("H3ToGeoBoundryWkt", children, ",");
 	}
 }

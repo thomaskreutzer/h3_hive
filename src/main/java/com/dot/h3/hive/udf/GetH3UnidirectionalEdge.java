@@ -11,66 +11,49 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.LongObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
-import org.apache.hadoop.io.BooleanWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
 
 import com.dot.h3.exceptions.H3InstantiationException;
 import com.uber.h3core.H3Core;
 
 
-@Description(name = "H3IndexesAreNeighbors",
-value = "_FUNC_(index long, index2 long) - returns a boolean\n "
-+ "_FUNC_(index string, index2 string) - returns a boolean",
+@Description(name = "GetH3UnidirectionalEdge",
+value = "_FUNC_(index long, index2 long) - returns a long index\n "
++ "_FUNC_(index string, index2 string) - returns a string index",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
-+ "  > CREATE TEMPORARY FUNCTION H3IndexesAreNeighbors AS 'com.dot.h3.hive.udf.H3IndexesAreNeighbors';\n"
-+ "  > SELECT H3IndexesAreNeighbors(61773312317403955,631243922056054783) AS neighbors;\n"
-+ "  > +------------+\n"
-+ "  > | neighbors  |\n"
-+ "  > +------------+\n"
-+ "  > | false      |\n"
-+ "  > +------------+\n\n"
++ "  > CREATE TEMPORARY FUNCTION GetH3UnidirectionalEdge AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdge';\n"
++ "  > SELECT GetH3UnidirectionalEdge(61773312317403955,631243922056054783) AS index;\n"
++ "  > Error: Error while compiling statement: FAILED: IllegalArgumentException Given indexes are not neighbors. (state=42000,code=40000)\n\n"
 
 
-+ "Example 2:\n"
-+ "  > CREATE TEMPORARY FUNCTION H3IndexesAreNeighbors AS 'com.dot.h3.hive.udf.H3IndexesAreNeighbors';\n"
-+ "  > SELECT H3IndexesAreNeighbors('db768011473333','892a100acc7ffff') AS neighbors;"
-+ "  > +------------+\n"
-+ "  > | neighbors  |\n"
-+ "  > +------------+\n"
-+ "  > | false      |\n"
-+ "  > +------------+\n\n"
++ "Example 2 neighbors that work:\n"
++ "  > CREATE TEMPORARY FUNCTION GetH3UnidirectionalEdge AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdge';\n"
++ "  > SELECT GetH3UnidirectionalEdge(617733122422996991,617733122423259135) AS index;"
++ "  > +----------------------+\n"
++ "  > |      neighbors       |\n"
++ "  > +----------------------+\n"
++ "  > | 1266251468764348415  |\n"
++ "  > +----------------------+\n\n"
 
-+ "Example 2:\n"
-+ "  > CREATE TEMPORARY FUNCTION H3IndexesAreNeighbors AS 'com.dot.h3.hive.udf.H3IndexesAreNeighbors';\n"
-+ "  > SELECT H3IndexesAreNeighbors('db768011473333','892a100acc7ffff') AS neighbors;"
-+ "  > +------------+\n"
-+ "  > | neighbors  |\n"
-+ "  > +------------+\n"
-+ "  > | false      |\n"
-+ "  > +------------+\n\n"
-
-
-+ "Example 3 neighbors that work:\n"
-+ "  > CREATE TEMPORARY FUNCTION H3IndexesAreNeighbors AS 'com.dot.h3.hive.udf.H3IndexesAreNeighbors';\n"
-+ "  > SELECT H3IndexesAreNeighbors(617733122422996991,617733122423259135) AS neighbors;"
-+ "  > +------------+\n"
-+ "  > | neighbors  |\n"
-+ "  > +------------+\n"
-+ "  > | true       |\n"
-+ "  > +------------+\n\n"
-
++ "Example 3 neighbors that work from string:\n"
++ "  > CREATE TEMPORARY FUNCTION GetH3UnidirectionalEdge AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdge';\n"
++ "  > SELECT GetH3UnidirectionalEdge('892a1008003ffff','892a1008007ffff') AS index;"
++ "  > +-------------------+\n"
++ "  > |       index       |\n"
++ "  > +-------------------+\n"
++ "  > | 1192a1008003ffff  |\n"
++ "  > +-------------------+\n\n"
 )
 
 
-
-
-
-public class H3IndexesAreNeighbors extends GenericUDF {
+public class GetH3UnidirectionalEdge extends GenericUDF {
 	PrimitiveObjectInspector inputOI0;
 	PrimitiveObjectInspector inputOI1;
 	H3Core h3;
 	
-	public H3IndexesAreNeighbors() throws H3InstantiationException {
+	public GetH3UnidirectionalEdge() throws H3InstantiationException {
 		try {
 			h3 = H3Core.newInstance();
 		} catch (IOException e) {
@@ -89,12 +72,16 @@ public class H3IndexesAreNeighbors extends GenericUDF {
 				(inputOI0 instanceof LongObjectInspector) && (inputOI0 instanceof LongObjectInspector)
 				|| (inputOI0 instanceof StringObjectInspector) && (inputOI0 instanceof StringObjectInspector) )
 			) {
-			throw new UDFArgumentException("Currently only combinations of string/string and long/long can be passed into H3IndexesAreNeighbors for the parameter.\n" 
+			throw new UDFArgumentException("Currently only combinations of string/string and long/long can be passed into GetH3UnidirectionalEdge for the parameter.\n" 
 					+ "The type passed in to argument 0 is " + inputOI0.getPrimitiveCategory().name() + "\n"
 					+ "The type passed in to argument 1 is " + inputOI1.getPrimitiveCategory().name());
 		}
 		
-		return PrimitiveObjectInspectorFactory.writableBooleanObjectInspector;
+		if(inputOI0.getPrimitiveCategory().name() == "STRING") {
+			return PrimitiveObjectInspectorFactory.writableStringObjectInspector;
+		} else {
+			return PrimitiveObjectInspectorFactory.writableLongObjectInspector;
+		}
 	}
 
 	@Override
@@ -108,19 +95,19 @@ public class H3IndexesAreNeighbors extends GenericUDF {
 		if(inputOI0.getPrimitiveCategory().name() == "STRING") {
 			String indexStr1 = (String) inputOI0.getPrimitiveJavaObject(arg0);
 			String indexStr2 = (String) inputOI0.getPrimitiveJavaObject(arg1);
-			boolean neighbors1 = h3.h3IndexesAreNeighbors(indexStr1, indexStr2);
-			return new BooleanWritable( neighbors1 );
+			String s = h3.getH3UnidirectionalEdge(indexStr1, indexStr2);
+			return new Text( s );
 		} else {
 			Long index1L = (Long) inputOI0.getPrimitiveJavaObject(arg0);
 			Long index2L = (Long) inputOI0.getPrimitiveJavaObject(arg1);
-			boolean neighbors2 = h3.h3IndexesAreNeighbors(index1L, index2L);
-			return new BooleanWritable( neighbors2 );
+			Long l = h3.getH3UnidirectionalEdge(index1L, index2L);
+			return new LongWritable( l );
 		}
 	}
 
 	@Override
 	public String getDisplayString(String[] children) {
-		return getStandardDisplayString("H3IndexesAreNeighbors", children, ",");
+		return getStandardDisplayString("GetH3UnidirectionalEdge", children, ",");
 	}
 	
 }
