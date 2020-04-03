@@ -2,6 +2,7 @@ package com.dot.h3.hive.udf;
 
 import java.io.IOException;
 
+import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
@@ -12,6 +13,20 @@ import org.apache.hadoop.io.LongWritable;
 
 import com.dot.h3.exceptions.H3InstantiationException;
 import com.uber.h3core.H3Core;
+
+
+@Description(name = "NumHexagons",
+value = "_FUNC_(int resolution) - returns a Long\n ",
+extended = "Returns NULL if any argument is NULL.\n"
++ "Example:\n"
++ "  > CREATE TEMPORARY FUNCTION NumHexagons as 'com.dot.h3.hive.udf.NumHexagons';\n"
++ "  > SELECT NumHexagons(9) AS num_hexagons;\n"
++ "  > +---------------+\n"
++ "  > | num_hexagons  |\n"
++ "  > +---------------+\n"
++ "  > | 4842432842    |\n"
++ "  > +---------------+\n\n"
+)
 
 public class NumHexagons extends GenericUDF {
 	private final LongWritable longReturn = new LongWritable();
