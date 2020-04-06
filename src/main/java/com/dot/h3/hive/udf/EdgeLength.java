@@ -76,9 +76,6 @@ public class EdgeLength extends GenericUDF {
 		} else {
 			throw new HiveException("The argument for Length Unit is invalid");
 		}
-
-		;
-		
 		doubleReturn.set(h3.edgeLength(res, unit));
 		return doubleReturn;
 	}

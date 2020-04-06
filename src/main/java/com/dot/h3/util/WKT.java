@@ -1,10 +1,12 @@
 package com.dot.h3.util;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
-import com.uber.h3core.util.GeoCoord;
 import com.uber.h3core.H3Core;
+import com.uber.h3core.util.GeoCoord;
 
 public class WKT {
 	
@@ -152,6 +154,24 @@ public class WKT {
 		//Close out MULTIPOLYGON
 		wkt.append(")");
 		return wkt.toString();
+	}
+	
+	public ArrayList<String> h3SetToMultiPolygonWktArray(List<List<List<GeoCoord>>> d){
+		ArrayList<String> r = new ArrayList<>();
+		for (int i = 0; i < d.size(); i++) {
+			for (int x = 0; x < d.get(i).size(); x++) {
+				String poly = geoCoordToPolygonWkt(d.get(i).get(x));
+				r.add(poly);
+			}
+		}
+		return RemoveDuplicates(r);
+	}
+	
+	private ArrayList<String> RemoveDuplicates(ArrayList<String> data){
+		Set<String> primesWithoutDuplicates = new LinkedHashSet<String>(data);
+		data.clear();
+		data.addAll(primesWithoutDuplicates);
+		return data;
 	}
 	
 	

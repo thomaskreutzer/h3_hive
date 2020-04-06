@@ -2,6 +2,8 @@ package com.dot.h3.example;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import com.dot.h3.util.WKT;
@@ -134,6 +136,17 @@ public class H3Example {
 			List<List<String>> krd2 = h3.kRingDistances(KRingDistanceIndex2, 3);
 			KringDistanxtStr = wkt.KringStringndexToMultiPolygon(krd2, h3);
 			System.out.println(KringDistanxtStr);
+			
+			
+			
+			Collection<Long> c = new HashSet<Long>();
+			c.add(631243922056054783L);
+			c.add(61773312317403955L);
+			
+			List<List<List<GeoCoord>>> t = h3.h3SetToMultiPolygon(c, false);
+			
+			System.out.println("h3SetToMultiPolygonWktArrayL \n" + wkt.h3SetToMultiPolygonWktArray(t));
+			
 			
 		} catch (IOException e) {
 				
