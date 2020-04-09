@@ -67,7 +67,7 @@ public class WKT {
 		
 		String multipolygonStripped= "";
 		if(wkt.contains("MULTIPOLYGON")) {
-			multipolygonStripped = wkt.replace("MULTIPOLYGON(", "").replace("MULTIPOLYGON (", "").replace(")))", "").replace("\n", "").replace("\r", "");
+			multipolygonStripped = wkt.replace("MULTIPOLYGON(", "").replace("MULTIPOLYGON (", "").replace(")))", "").replace("\n", "").replace("\r", "").replaceAll(",\\s*", ",");
 			polygons = cleanPolygonsArr( multipolygonStripped.split("\\),\\(") );
 			//Loop each of the polygons returned as the List<String>
 			for (int i = 0; i < polygons.size(); i++) {

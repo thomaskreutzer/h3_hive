@@ -43,7 +43,7 @@ end
 **NOTE:** Temporary functions are used for these examples. Temporary functions will not work in LLAP.
 You must create permanent functions in LLAP. 
 
-## EdgeLength
+### EdgeLength
 ```SQL
 CREATE TEMPORARY FUNCTION EdgeLength AS 'com.dot.h3.hive.udf.EdgeLength';
 SELECT _FUNC_(12, 'm') AS edge_meters;
@@ -54,10 +54,10 @@ SELECT _FUNC_(12, 'm') AS edge_meters;
 +--------------+
 ```
 
-# GeoToH3
+### GeoToH3
 ```SQL
 CREATE TEMPORARY FUNCTION GeoToH3 AS 'com.dot.h3.hive.udf.GeoToH3';
-SELECT GeoToH3(40.86016, -73.90071, 12) as indexx;
+SELECT GeoToH3(40.86016, -73.90071, 12) AS index;
 +---------------------+
 |        index        |
 +---------------------+
@@ -65,4 +65,38 @@ SELECT GeoToH3(40.86016, -73.90071, 12) as indexx;
 +---------------------+
 ```
 
+### GeoToH3Address
+```SQL
+CREATE TEMPORARY FUNCTION GeoToH3Address AS 'com.dot.h3.hive.udf.GeoToH3Address';
+SELECT GeoToH3Address(40.86016, -73.90071, 12) AS index;
++------------------+
+|      index       |
++------------------+
+| 892a100acc7ffff  |
++------------------+
+```
+
+### GetH3UnidirectionalEdge
+
+**First Example** neighbors that work
+```SQL
+CREATE TEMPORARY FUNCTION GetH3UnidirectionalEdge AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdge';
+SELECT GetH3UnidirectionalEdge(617733122422996991,617733122423259135) AS edge;
+ +----------------------+
+ |         edge         |
+ +----------------------+
+ | 1266251468764348415  |
+ +----------------------+
+```
+
+*Second Example: * neighbors that work from string:
+```SQL
+CREATE TEMPORARY FUNCTION GetH3UnidirectionalEdge AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdge';
+SELECT GetH3UnidirectionalEdge('892a1008003ffff','892a1008007ffff') AS edge;"
+ +-------------------+
+ |        edge       |
+ +-------------------+
+ | 1192a1008003ffff  |
+ +-------------------+
+```
 

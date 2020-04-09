@@ -21,7 +21,7 @@ value = "_FUNC_(double lat, double long, integer resolution) - returns a String 
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
 + "  > CREATE TEMPORARY FUNCTION GeoToH3Address AS 'com.dot.h3.hive.udf.GeoToH3Address';"
-+ "  > SELECT GeoToH3Address(40.86016, -73.90071, 12);\n"
++ "  > SELECT GeoToH3Address(40.86016, -73.90071, 12) AS index;\n"
 + "  > 892a100acc7ffff\n"
 + " The resolution can be between 0 and 15, 15 is the most granular")
 
