@@ -19,7 +19,7 @@ import com.dot.h3.util.WKT;
 import com.uber.h3core.H3Core;
 import com.uber.h3core.util.GeoCoord;
 
-@Description(name = "H3ToGeoBoundryWkt",
+@Description(name = "H3ToGeoBoundaryWkt",
 value = "_FUNC_(long index) - returns WKT Polygon\n"
 + "_FUNC_(string index) - returns WKT Polygon\\",
 extended = "Returns NULL if any argument is NULL.\n"
@@ -44,13 +44,13 @@ extended = "Returns NULL if any argument is NULL.\n"
 
 
 
-public class H3ToGeoBoundryWkt extends GenericUDF {
+public class H3ToGeoBoundaryWkt extends GenericUDF {
 	private final Text strOut = new Text();
 	PrimitiveObjectInspector inputOI0;
 	H3Core h3;
 	WKT wkt;
 	
-	public H3ToGeoBoundryWkt() throws H3InstantiationException {
+	public H3ToGeoBoundaryWkt() throws H3InstantiationException {
 		wkt = new WKT();
 		try {
 			h3 = H3Core.newInstance();
@@ -68,7 +68,7 @@ public class H3ToGeoBoundryWkt extends GenericUDF {
 		if (! ( (inputOI0 instanceof StringObjectInspector)
 				|| (inputOI0 instanceof LongObjectInspector) )
 			) {
-			throw new UDFArgumentException("Currently only string and long can be passed into H3ToGeoBoundryWkt for the argument.\n" 
+			throw new UDFArgumentException("Currently only string and long can be passed into H3ToGeoBoundaryWkt for the argument.\n" 
 					+ "The type passed in to argument 0 is " + inputOI0.getPrimitiveCategory().name() );
 		}
 		ObjectInspector outputOI = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
@@ -95,6 +95,6 @@ public class H3ToGeoBoundryWkt extends GenericUDF {
 
 	@Override
 	public String getDisplayString(String[] children) {
-		return getStandardDisplayString("H3ToGeoBoundryWkt", children, ",");
+		return getStandardDisplayString("H3ToGeoBoundaryWkt", children, ",");
 	}
 }

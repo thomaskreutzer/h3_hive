@@ -19,7 +19,7 @@ import com.uber.h3core.util.GeoCoord;
 
 import org.apache.hadoop.io.Text;
 
-@Description(name = "LatLongH3ToGeoBoundryWkt",
+@Description(name = "LatLongH3ToGeoBoundaryWkt",
 value = "_FUNC_(double lat, double long, integer resolution) - returns a WKT",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
@@ -27,7 +27,7 @@ extended = "Returns NULL if any argument is NULL.\n"
 + "  POLYGON((-73.90218697935661 40.862381901482266,-73.9042969767565 40.86144407471913,-73.90423087546569 40.85968095579108,-73.90205493792557 40.858855661723865,-73.89994501590182 40.85979341878112,-73.90001095604163 40.86155653960862))\n"
 + " The resolution can be between 0 and 15, 15 is the most granular")
 
-public class LatLongH3ToGeoBoundryWkt extends GenericUDF {
+public class LatLongH3ToGeoBoundaryWkt extends GenericUDF {
 	private final Text strOut = new Text();
 	PrimitiveObjectInspector inputOI0;
 	PrimitiveObjectInspector inputOI1;
@@ -35,7 +35,7 @@ public class LatLongH3ToGeoBoundryWkt extends GenericUDF {
 	WKT wkt;
 	H3Core h3;
 	
-	public LatLongH3ToGeoBoundryWkt() throws H3InstantiationException {
+	public LatLongH3ToGeoBoundaryWkt() throws H3InstantiationException {
 		wkt = new WKT();
 		try {
 			h3 = H3Core.newInstance();
@@ -82,6 +82,6 @@ public class LatLongH3ToGeoBoundryWkt extends GenericUDF {
 
 	@Override
 	public String getDisplayString(String[] children) {
-		return getStandardDisplayString("LatLongH3ToGeoBoundryWkt", children, ",");
+		return getStandardDisplayString("LatLongH3ToGeoBoundaryWkt", children, ",");
 	}
 }
