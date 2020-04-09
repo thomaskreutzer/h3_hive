@@ -1,9 +1,11 @@
 # h3_hive
+
 H3 UDF's for Apache Hive
 
 
 
 ## Function List
+
 1. EdgeLength
 2. GeoToH3
 3. GeoToH3Address
@@ -40,10 +42,12 @@ end
 ```
 
 ## Function Examples
+
 **NOTE:** Temporary functions are used for these examples. Temporary functions will not work in LLAP.
 You must create permanent functions in LLAP. 
 
 ### EdgeLength
+
 ```SQL
 CREATE TEMPORARY FUNCTION EdgeLength AS 'com.dot.h3.hive.udf.EdgeLength';
 SELECT _FUNC_(12, 'm') AS edge_meters;
@@ -55,6 +59,7 @@ SELECT _FUNC_(12, 'm') AS edge_meters;
 ```
 
 ### GeoToH3
+
 ```SQL
 CREATE TEMPORARY FUNCTION GeoToH3 AS 'com.dot.h3.hive.udf.GeoToH3';
 SELECT GeoToH3(40.86016, -73.90071, 12) AS index;
@@ -66,6 +71,7 @@ SELECT GeoToH3(40.86016, -73.90071, 12) AS index;
 ```
 
 ### GeoToH3Address
+
 ```SQL
 CREATE TEMPORARY FUNCTION GeoToH3Address AS 'com.dot.h3.hive.udf.GeoToH3Address';
 SELECT GeoToH3Address(40.86016, -73.90071, 12) AS index;
@@ -77,18 +83,20 @@ SELECT GeoToH3Address(40.86016, -73.90071, 12) AS index;
 ```
 
 ### GetH3UnidirectionalEdge
-**NOTE:* The indexes must be neighbors for this to work.
+
+**NOTE:** The indexes must be neighbors for this to work.
 
 **BAD EXAMPLE**
 
 ```SQL
-CREATE TEMPORARY FUNCTION GetH3UnidirectionalEdge AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdge';\n"
+CREATE TEMPORARY FUNCTION GetH3UnidirectionalEdge AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdge';
 SELECT GetH3UnidirectionalEdge(61773312317403955,631243922056054783) AS index;
 Error: Error while compiling statement: FAILED: IllegalArgumentException Given indexes are not neighbors. (state=42000,code=40000)
 ```
 
 
 **First Example:** neighbors that work
+
 ```SQL
 CREATE TEMPORARY FUNCTION GetH3UnidirectionalEdge AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdge';
 SELECT GetH3UnidirectionalEdge(617733122422996991,617733122423259135) AS edge;
@@ -100,6 +108,7 @@ SELECT GetH3UnidirectionalEdge(617733122422996991,617733122423259135) AS edge;
 ```
 
 **Second Example:** neighbors that work from string:
+
 ```SQL
 CREATE TEMPORARY FUNCTION GetH3UnidirectionalEdge AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdge';
 SELECT GetH3UnidirectionalEdge('892a1008003ffff','892a1008007ffff') AS edge;"
@@ -109,8 +118,12 @@ SELECT GetH3UnidirectionalEdge('892a1008003ffff','892a1008007ffff') AS edge;"
  | 1192a1008003ffff  |
  +-------------------+
 ```
+
+
 ### GetH3UnidirectionalEdgesFromHexagon
+
 **First Example:** 
+
 ```SQL
 CREATE TEMPORARY FUNCTION gh3udefh AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdgesFromHexagon';
 SELECT gh3udefh(599718724986994687) AS list;
@@ -122,6 +135,7 @@ SELECT gh3udefh(599718724986994687) AS list;
 ```
 
 **Second Example:** 
+
 ```SQL
 CREATE TEMPORARY FUNCTION gh3udefh AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdgesFromHexagon';
 SELECT gh3udefh('852a100bfffffff') AS list;"
@@ -133,6 +147,27 @@ SELECT gh3udefh('852a100bfffffff') AS list;"
 ```
 
 
+### H3Distance
+
+**NOTE:** The indexes must be neighbors for this to work.
+
+```SQL
+CREATE TEMPORARY FUNCTION H3Distance AS 'com.dot.h3.hive.udf.H3Distance';
+SELECT H3Distance(61773312317403955,631243922056054783) AS dist;
+Error: Error while compiling statement: FAILED: SemanticException [Error 10014]: Line 1:7 Wrong arguments '631243922056054783': org.apache.hadoop.hive.ql.metadata.HiveException:com.uber.h3core.exceptions.DistanceUndefinedException: Distance not defined between the two indexes. (state=42000,code=10014)
+```
+
+**Example:** neighbors that work
+
+```SQL
+CREATE TEMPORARY FUNCTION H3Distance AS 'com.dot.h3.hive.udf.H3Distance';
+SELECT H3Distance(617733122422996991,617733122423259135) AS dist;
++-------+
+| dist  |
++-------+
+| 1     |
++-------+
+```
 
 
 
