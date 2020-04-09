@@ -18,7 +18,7 @@ H3 UDF's for Apache Hive
 10. H3ToCenterChildWkt
 11. H3ToChildren
 12. H3ToChildrenWkt
-13. H3ToGeoBoundryWkt
+13. H3ToGeoBoundaryWkt
 14. H3ToGeoWkt
 15. H3ToParent
 16. H3ToParentWkt
@@ -27,7 +27,7 @@ H3 UDF's for Apache Hive
 19. KRing
 20. KRingDistances
 21. KRingToWkt
-22. LatLongH3ToGeoBoundryWkt
+22. LatLongH3ToGeoBoundaryWkt
 23. NumHexagons
 24. PolyfillToArrayH3Index
 25. PolyfillToArrayWkt
