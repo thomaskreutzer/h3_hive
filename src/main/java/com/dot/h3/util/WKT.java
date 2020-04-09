@@ -12,12 +12,21 @@ public class WKT {
 	
 	public String geoCoordToPolygonWkt(List<GeoCoord> gc){
 		StringBuilder builder=new StringBuilder();
+		String repeatVal = "";
 		builder.append("POLYGON((");
 		for (int i = 0; i < gc.size(); i++) {
+			String lngLat =  gc.get(i).lng + " " + gc.get(i).lat;
 			if(i>0){
 				builder.append(",");
 			}
-			builder.append( gc.get(i).lng + " " + gc.get(i).lat );
+			if(i==0){
+				repeatVal = lngLat;
+			}
+			builder.append( lngLat );
+			//If this is the last in the inner loop and not the first loop append the final closer...
+			if(i==gc.size()-1 && i>0) {
+				builder.append("," + repeatVal);
+			}
 		}
 		builder.append("))");
 		return builder.toString();
@@ -55,7 +64,8 @@ public class WKT {
 			String[] longLat = splt[i].split(" "); //Split on the space
 			String lng = longLat[0];
 			String lat = longLat[1];
-			lgc.add( new GeoCoord( Double.parseDouble( lng.trim() ), Double.parseDouble( lat.trim() ) ) );
+			//NOTE: WKT is in the order LNG/LAT  Uber H3 GeoCoord is in the Order LAT/LNG
+			lgc.add( new GeoCoord( Double.parseDouble( lat.trim() ), Double.parseDouble( lng.trim() ) ) );
 		}
 		return lgc;
 	}
@@ -75,7 +85,10 @@ public class WKT {
 				String[] longLatArr = polygons.get(i).split(",");
 				for(int x = 0; x < longLatArr.length; x++) {
 					String[] longLat = longLatArr[x].split(" "); //Split on the space
-					gc.add( new GeoCoord( Double.parseDouble(longLat[0]), Double.parseDouble(longLat[1]) ) ); 
+					String lng = longLat[0];
+					String lat = longLat[1];
+					//NOTE: WKT is in the order LNG/LAT  Uber H3 GeoCoord is in the Order LAT/LNG
+					gc.add( new GeoCoord( Double.parseDouble( lat.trim() ), Double.parseDouble( lng.trim() ) ) ); 
 				}
 				//Add the list of coordinates to the list
 				lgc.add(gc);

@@ -24,8 +24,8 @@ value = "_FUNC_(long index) - returns WKT Polygon\n"
 + "_FUNC_(string index) - returns WKT Polygon\\",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
-+ "  > CREATE TEMPORARY FUNCTION H3ToGeoBoundryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundryWkt';\n"
-+ "  > SELECT H3ToGeoBoundryWkt(61773312317403955) AS wkt;\n"
++ "  > CREATE TEMPORARY FUNCTION H3ToGeoBoundaryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundaryWkt';\n"
++ "  > SELECT H3ToGeoBoundaryWkt(61773312317403955) AS wkt;\n"
 + "  > +----------------------------------------------------+\n"
 + "  > |                        wkt                         |\n"
 + "  > +----------------------------------------------------+\n"
@@ -33,8 +33,8 @@ extended = "Returns NULL if any argument is NULL.\n"
 + "  > +----------------------------------------------------+\n\n"
 
 + "Example 2:\n"
-+ "  > CREATE TEMPORARY FUNCTION H3ToGeoBoundryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundryWkt';\n"
-+ "  > SELECT H3ToGeoBoundryWkt('892a100acc7ffff') AS wkt;"
++ "  > CREATE TEMPORARY FUNCTION H3ToGeoBoundaryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundaryWkt';\n"
++ "  > SELECT H3ToGeoBoundaryWkt('892a100acc7ffff') AS wkt;"
 + "  > +----------------------------------------------------+\n"
 + "  > |                        wkt                         |\n"
 + "  > +----------------------------------------------------+\n"
@@ -80,13 +80,14 @@ public class H3ToGeoBoundaryWkt extends GenericUDF {
 		Object arg0 = arguments[0].get(); //Index
 		String out;
 		if (arg0 == null) return null;
-		if(inputOI0.getPrimitiveCategory().name() == "STRING") {
-			String indexStr = (String) inputOI0.getPrimitiveJavaObject(arg0);
-			List<GeoCoord> gcoord = h3.h3ToGeoBoundary(indexStr);
-			out = wkt.geoCoordToPolygonWkt(gcoord);
-		} else {
+		System.out.println(inputOI0.getPrimitiveCategory().name());
+		if(inputOI0.getPrimitiveCategory().name().equals("LONG")) {
 			Long index = (Long) inputOI0.getPrimitiveJavaObject(arg0);
 			List<GeoCoord> gcoord = h3.h3ToGeoBoundary(index);
+			out = wkt.geoCoordToPolygonWkt(gcoord);
+		} else {
+			String indexStr = (String) inputOI0.getPrimitiveJavaObject(arg0);
+			List<GeoCoord> gcoord = h3.h3ToGeoBoundary(indexStr);
 			out = wkt.geoCoordToPolygonWkt(gcoord);
 		}
 		strOut.set( out );
