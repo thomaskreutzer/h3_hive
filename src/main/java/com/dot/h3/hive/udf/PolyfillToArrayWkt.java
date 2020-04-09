@@ -25,7 +25,8 @@ value = "_FUNC_(string plygon_wkt, string holes_poly_multipoly, integer resoluti
 extended = "Returns NULL if polygon_wkt or resultion arguments are NULL.\n"
 
 + "Example:\n"
-+ "  > SELECT _FUNC_('POLYGON((-71.23094863399959 42.35171702149799,-71.20507841890782 42.39384377360396,-71.18534241583312 42.40583588152941,-71.13489748711537 42.40374196572458,-71.12786523200806 42.3537116038451,-71.23094863399959 42.35171702149799))', null, 9) AS WKT;\n"
++ "  > CREATE TEMPORARY FUNCTION PolyfillToArrayWkt AS 'com.dot.h3.hive.udf.PolyfillToArrayWkt';"
++ "  > SELECT PolyfillToArrayWkt('POLYGON((-71.23094863399959 42.35171702149799,-71.20507841890782 42.39384377360396,-71.18534241583312 42.40583588152941,-71.13489748711537 42.40374196572458,-71.12786523200806 42.3537116038451,-71.23094863399959 42.35171702149799))', null, 9) AS WKT;\n"
 + "  Returns Array<String> \n"
 + "Can take either NULL, MULTIPOLYGON or POLYGON WKT for the holes_poly_multipoly argument.\n"
 + " The resolution can be between 0 and 15, 15 is the most granular")

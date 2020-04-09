@@ -20,7 +20,8 @@ import org.apache.hadoop.io.LongWritable;
 value = "_FUNC_(double lat, double long, integer resolution) - returns a long of the H3 index",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
-+ "  > SELECT _FUNC_(40.86016, -73.90071, 12);\n"
++ "  > CREATE TEMPORARY FUNCTION GeoToH3 AS 'com.dot.h3.hive.udf.GeoToH3';"
++ "  > SELECT GeoToH3(40.86016, -73.90071, 12);\n"
 + "  631243922056054783\n"
 + " The resolution can be between 0 and 15, 15 is the most granular")
 

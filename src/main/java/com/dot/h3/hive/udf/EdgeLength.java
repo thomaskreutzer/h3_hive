@@ -15,10 +15,11 @@ import com.dot.h3.exceptions.H3InstantiationException;
 import com.uber.h3core.H3Core;
 import com.uber.h3core.LengthUnit;
 
-@Description(name = "GeoToH3",
+@Description(name = "EdgeLength",
 value = "_FUNC_(integer resolution, string lengthUnit) - returns a double of the unit",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
++ "  > CREATE TEMPORARY FUNCTION EdgeLength AS 'com.dot.h3.hive.udf.EdgeLength';"
 + "  > SELECT _FUNC_(12, 'm') AS edge_meters;\n"
 + "  > +--------------+\n"
 + "  > | edge_meters  |\n"

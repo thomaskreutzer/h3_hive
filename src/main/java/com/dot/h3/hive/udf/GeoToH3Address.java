@@ -20,7 +20,8 @@ import org.apache.hadoop.io.Text;
 value = "_FUNC_(double lat, double long, integer resolution) - returns a String of the H3 index",
 extended = "Returns NULL if any argument is NULL.\n"
 + "Example:\n"
-+ "  > SELECT _FUNC_(40.86016, -73.90071, 12);\n"
++ "  > CREATE TEMPORARY FUNCTION GeoToH3Address AS 'com.dot.h3.hive.udf.GeoToH3Address';"
++ "  > SELECT GeoToH3Address(40.86016, -73.90071, 12);\n"
 + "  > 892a100acc7ffff\n"
 + " The resolution can be between 0 and 15, 15 is the most granular")
 
