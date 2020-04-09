@@ -193,7 +193,7 @@ SELECT H3IndexesAreNeighbors(617733122422996991,617733122423259135) AS neighbors
 +------------+
 | true       |
 +------------+
-~~~
+```
 
 ### H3SetToMultiPolygon
 
