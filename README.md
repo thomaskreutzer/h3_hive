@@ -77,8 +77,18 @@ SELECT GeoToH3Address(40.86016, -73.90071, 12) AS index;
 ```
 
 ### GetH3UnidirectionalEdge
+**NOTE:* The indexes must be neighbors for this to work.
 
-**First Example** neighbors that work
+**BAD EXAMPLE**
+
+```SQL
+CREATE TEMPORARY FUNCTION GetH3UnidirectionalEdge AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdge';\n"
+SELECT GetH3UnidirectionalEdge(61773312317403955,631243922056054783) AS index;
+Error: Error while compiling statement: FAILED: IllegalArgumentException Given indexes are not neighbors. (state=42000,code=40000)
+```
+
+
+**First Example:** neighbors that work
 ```SQL
 CREATE TEMPORARY FUNCTION GetH3UnidirectionalEdge AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdge';
 SELECT GetH3UnidirectionalEdge(617733122422996991,617733122423259135) AS edge;
@@ -89,7 +99,7 @@ SELECT GetH3UnidirectionalEdge(617733122422996991,617733122423259135) AS edge;
  +----------------------+
 ```
 
-*Second Example: * neighbors that work from string:
+**Second Example:** neighbors that work from string:
 ```SQL
 CREATE TEMPORARY FUNCTION GetH3UnidirectionalEdge AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdge';
 SELECT GetH3UnidirectionalEdge('892a1008003ffff','892a1008007ffff') AS edge;"
@@ -99,4 +109,30 @@ SELECT GetH3UnidirectionalEdge('892a1008003ffff','892a1008007ffff') AS edge;"
  | 1192a1008003ffff  |
  +-------------------+
 ```
+### GetH3UnidirectionalEdgesFromHexagon
+**First Example:** 
+```SQL
+CREATE TEMPORARY FUNCTION gh3udefh AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdgesFromHexagon';
+SELECT gh3udefh(599718724986994687) AS list;
++----------------------------------------------------+
+|                        list                        |
++----------------------------------------------------+
+| [1248237071328346111,1320294665366274047, etc.     |
++----------------------------------------------------+
+```
+
+**Second Example:** 
+```SQL
+CREATE TEMPORARY FUNCTION gh3udefh AS 'com.dot.h3.hive.udf.GetH3UnidirectionalEdgesFromHexagon';
+SELECT gh3udefh('852a100bfffffff') AS list;"
++----------------------------------------------------+
+|                        list                        |
++----------------------------------------------------+
+| [\"1152a100bfffffff\",\"1252a100bfffffff\", etc.   |
++----------------------------------------------------+
+```
+
+
+
+
 
