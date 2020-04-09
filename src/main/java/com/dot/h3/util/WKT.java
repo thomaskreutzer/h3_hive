@@ -48,11 +48,14 @@ public class WKT {
 	
 	public List<GeoCoord> wktPolygonToGeoCoord(String wkt) {
 		List<GeoCoord> lgc = new ArrayList<GeoCoord>();
-		wkt = wkt.replace("POLYGON((", "").replace("POINT(", "").replace("))", "").replace(")", "");
+		//This has to clean up any number of spaces after the comma as seen in the last replaceAll
+		wkt = wkt.replace("POLYGON((", "").replace("POLYGON ((", "").replace("POINT(", "").replace("POINT (", "").replace("))", "").replace(")", "").replaceAll(",\\s*", ",");
 		String[] splt = wkt.split(",");
 		for (int i = 0; i < splt.length; i++) {
 			String[] longLat = splt[i].split(" "); //Split on the space
-			lgc.add( new GeoCoord( Double.parseDouble(longLat[0]), Double.parseDouble(longLat[1]) ) );
+			String lng = longLat[0];
+			String lat = longLat[1];
+			lgc.add( new GeoCoord( Double.parseDouble( lng.trim() ), Double.parseDouble( lat.trim() ) ) );
 		}
 		return lgc;
 	}
@@ -62,10 +65,10 @@ public class WKT {
 		List<List<GeoCoord>> lgc = new ArrayList<List<GeoCoord>>();
 		List<String> polygons;
 		
-		String multipolygonParsed = "";
+		String multipolygonStripped= "";
 		if(wkt.contains("MULTIPOLYGON")) {
-			multipolygonParsed = wkt.replace("MULTIPOLYGON(", "").replace(")))", "").replace("\n", "").replace("\r", "");
-			polygons = cleanPolygonsArr( multipolygonParsed.split("\\),\\(") );
+			multipolygonStripped = wkt.replace("MULTIPOLYGON(", "").replace("MULTIPOLYGON (", "").replace(")))", "").replace("\n", "").replace("\r", "");
+			polygons = cleanPolygonsArr( multipolygonStripped.split("\\),\\(") );
 			//Loop each of the polygons returned as the List<String>
 			for (int i = 0; i < polygons.size(); i++) {
 				List<GeoCoord> gc = new ArrayList<GeoCoord>();

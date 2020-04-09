@@ -41,7 +41,10 @@ DESCRIBE FUNCTION EXTENDED <function_name>;
 end
 ```
 
+## Function Examples
+**NOTE** Temporary functions are used for these examples. Temporary functions will not work in LLAP.
 
+## EdgeLength
 
 
 
