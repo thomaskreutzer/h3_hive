@@ -171,11 +171,11 @@ SELECT H3Distance(617733122422996991,617733122423259135) AS dist;
 
 ### H3IndexesAreNeighbors
 
-** BAD Example**
+**BAD Example**
 
 ```SQL
 CREATE TEMPORARY FUNCTION H3IndexesAreNeighbors AS 'com.dot.h3.hive.udf.H3IndexesAreNeighbors';
-SELECT H3IndexesAreNeighbors('db768011473333','892a100acc7ffff') AS neighbors;"
+SELECT H3IndexesAreNeighbors('db768011473333','892a100acc7ffff') AS neighbors;
 +------------+
 | neighbors  |
 +------------+
@@ -187,7 +187,7 @@ SELECT H3IndexesAreNeighbors('db768011473333','892a100acc7ffff') AS neighbors;"
 
 ```SQL
 CREATE TEMPORARY FUNCTION H3IndexesAreNeighbors AS 'com.dot.h3.hive.udf.H3IndexesAreNeighbors';
-SELECT H3IndexesAreNeighbors(617733122422996991,617733122423259135) AS neighbors;"
+SELECT H3IndexesAreNeighbors(617733122422996991,617733122423259135) AS neighbors;
 +------------+
 | neighbors  |
 +------------+
