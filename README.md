@@ -3,8 +3,6 @@ H3 UDF's for Apache Hive
 
 
 
-
-
 ## Function List
 1. EdgeLength
 2. GeoToH3
@@ -42,9 +40,29 @@ end
 ```
 
 ## Function Examples
-**NOTE** Temporary functions are used for these examples. Temporary functions will not work in LLAP.
+**NOTE:** Temporary functions are used for these examples. Temporary functions will not work in LLAP.
+You must create permanent functions in LLAP. 
 
 ## EdgeLength
+```SQL
+CREATE TEMPORARY FUNCTION EdgeLength AS 'com.dot.h3.hive.udf.EdgeLength';
+SELECT _FUNC_(12, 'm') AS edge_meters;
++--------------+
+| edge_meters  |
++--------------+
+| 9.415526211  |
++--------------+
+```
 
+# GeoToH3
+```SQL
+CREATE TEMPORARY FUNCTION GeoToH3 AS 'com.dot.h3.hive.udf.GeoToH3';
+SELECT GeoToH3(40.86016, -73.90071, 12) as indexx;
++---------------------+
+|        index        |
++---------------------+
+| 631243922056054783  |
++---------------------+
+```
 
 
