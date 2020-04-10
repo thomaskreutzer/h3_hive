@@ -220,3 +220,402 @@ SELECT H3SetToMultiPolygon(array('892a1008003ffff','892a1008007ffff')) AS wkt_ar
 |                 same as the above                  |
 +----------------------------------------------------+)
 ```
+
+### H3ToCenterChild
+
+
+**Example 1**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToCenterChild AS 'com.dot.h3.hive.udf.H3ToCenterChild'
+SELECT H3ToCenterChild(61773312317403955, 13) AS center_child
++--------------------+
+|    center_child    |
++--------------------+
+| 61773312317403955  |
++--------------------+
+```
+
+**Example 2**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToCenterChild AS 'com.dot.h3.hive.udf.H3ToCenterChild'
+SELECT H3ToCenterChild('db768011473333', 13) AS center_child;
++-----------------+
+|  center_child   |
++-----------------+
+| db768011473333  |
++-----------------+
+```
+
+
+### H3ToCenterChildWkt
+
+
+**Example 1**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToCenterChildWkt AS 'com.dot.h3.hive.udf.H3ToCenterChildWkt'
+SELECT H3ToCenterChildWkt(61773312317403955, 13) AS center_child_wkt;
++------------------------------------------------+
+|                center_child_wkt                |
++------------------------------------------------+
+| POINT(-105.89054624819013 -30.32377110841559)  |
++------------------------------------------------+
+```
+
+**Example 2**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToCenterChildWkt AS 'com.dot.h3.hive.udf.H3ToCenterChildWkt';
+SELECT H3ToCenterChildWkt('db768011473333', 13) AS center_child_wkt;"
++------------------------------------------------+
+|                center_child_wkt                |
++------------------------------------------------+
+| POINT(-105.89054624819013 -30.32377110841559)  |
++------------------------------------------------+
+```
+
+
+### H3ToChildren
+
+**Example 1**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToChildren AS 'com.dot.h3.hive.udf.H3ToChildren';
+SELECT H3ToChildren(599718724986994687, 9) AS children;
++----------------------------------------------------+
+|                      children                      |
++----------------------------------------------------+
+| [617733122422996991,617733122423259135,617733122423521279, etc.. 
++----------------------------------------------------+
+```
+
+**Example 2**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToChildren AS 'com.dot.h3.hive.udf.H3ToChildren';
+SELECT H3ToChildren('852a100bfffffff', 9) AS children;"
++----------------------------------------------------+
+|                      children                      |
++----------------------------------------------------+
+| [\"892a1008003ffff\",\"892a1008007ffff\", etc...   |
++----------------------------------------------------+
+```
+
+
+### H3ToChildrenWkt
+
+**Example 1**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToChildrenWkt AS 'com.dot.h3.hive.udf.H3ToChildrenWkt';
+SELECT H3ToChildrenWkt(599718724986994687, 9) AS children;
++----------------------------------------------------+
+|                      children                      |
++----------------------------------------------------+
+| [\"POINT(-73.99191613398102 40.85293293570688)\",\"POINT(-73.98966951517899 40.85034641308286)\",
++----------------------------------------------------+
+```
+
+**Example 2**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToChildrenWkt AS 'com.dot.h3.hive.udf.H3ToChildrenWkt';
+SELECT H3ToChildrenWkt('852a100bfffffff', 9) AS children;"
++----------------------------------------------------+
+|                      children                      |
++----------------------------------------------------+
+| [\"POINT(-73.99191613398102 40.85293293570688)\",\"POINT(-73.98966951517899 40.85034641308286)\",
++----------------------------------------------------+
+```
+
+
+### H3ToGeoBoundaryWkt
+
+**Example 1**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToGeoBoundaryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundaryWkt';
+SELECT H3ToGeoBoundaryWkt(61773312317403955) AS wkt;
++----------------------------------------------------+
+|                        wkt                         |
++----------------------------------------------------+
+| POLYGON((-105.89053610304362 -30.323807809188516,  |
++----------------------------------------------------+
+```
+
+**Example 2**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToGeoBoundaryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundaryWkt';
+SELECT H3ToGeoBoundaryWkt('892a100acc7ffff') AS wkt;"
++----------------------------------------------------+
+|                        wkt                         |
++----------------------------------------------------+
+| POLYGON((-105.89053610304362 -30.323807809188516,  |
++----------------------------------------------------+
+```
+
+
+
+### H3ToGeoWkt
+
+**Example 1**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToGeoWkt AS 'com.dot.h3.hive.udf.H3ToGeoWkt';
+SELECT H3ToGeoWkt(61773312317403955) AS wkt;
++------------------------------------------------+
+|                      wkt                       |
++------------------------------------------------+
+| POINT(-105.89054624819013 -30.32377110841559)  |
++------------------------------------------------+
+```
+
+**Example 2**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToGeoWkt AS 'com.dot.h3.hive.udf.H3ToGeoWkt';
+SELECT H3ToGeoWkt('892a100acc7ffff') AS wkt;"
++------------------------------------------------+
+|                      wkt                       |
++------------------------------------------------+
+| POINT(-105.89054624819013 -30.32377110841559)  |
++------------------------------------------------+
+```
+
+
+### H3ToParent
+
+**Example 1**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToParent AS 'com.dot.h3.hive.udf.H3ToParent';
+SELECT H3ToParent(617733123174039551, 5) AS parent;
++---------------------+
+|       parent        |
++---------------------+
+| 599718724986994687  |
++---------------------+
+```
+
+**Example 2**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToParent AS 'com.dot.h3.hive.udf.H3ToParent';
+SELECT H3ToParent('892a100acc7ffff', 5) AS parent;"
++------------------+
+|      parent      |
++------------------+
+| 852a100bfffffff  |
++------------------+
+```
+
+### H3ToParentWkt
+
+**Example 1**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToParentWkt AS 'com.dot.h3.hive.udf.H3ToParentWkt';
+SELECT H3ToParentWkt(617733123174039551, 9) AS parent;
++----------------------------------------------+
+|                    parent                    |
++----------------------------------------------+
+| POINT(-73.90212095615803 40.86061876224212)  |
++----------------------------------------------+
+```
+
+**Example 2**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToParentWkt AS 'com.dot.h3.hive.udf.H3ToParentWkt';
+SELECT H3ToParentWkt('892a100acc7ffff', 9) AS parent;"
++----------------------------------------------+
+|                    parent                    |
++----------------------------------------------+
+| POINT(-73.90212095615803 40.86061876224212)  |
++----------------------------------------------+
+```
+
+
+### H3ToString
+
+**Example**
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToString AS 'com.dot.h3.hive.udf.H3ToString';
+SELECT H3ToString(631243922056054783);
+8c2a100acc687ff
+```
+
+### HexArea
+
+**Example 1**
+
+```SQL
+CREATE TEMPORARY FUNCTION HexArea as 'com.dot.h3.hive.udf.HexArea';
+SELECT HexArea(9, 'km2') AS hex_area;
++------------+
+|  hex_area  |
++------------+
+| 0.1053325  |
++------------+
+```
+
+**Example 2**
+
+```SQL
+CREATE TEMPORARY FUNCTION HexArea as 'com.dot.h3.hive.udf.HexArea';
+SELECT HexArea(9, 'm2') AS hex_area;
++-----------+
+| hex_area  |
++-----------+
+| 105332.5  |
++-----------+
+```
+
+
+
+
+### KRing
+
+**Example 1**
+
+```SQL
+CREATE TEMPORARY FUNCTION KRing AS 'com.dot.h3.hive.udf.KRing';
+SELECT KRing(617733123174039551, 9) AS kring;
++----------------------------------------------+
+|                    kring                     |
++----------------------------------------------+
+| [617733123174039551,617733123173777407, etc. |
++----------------------------------------------+
+```
+
+**Example 2**
+
+```SQL
+CREATE TEMPORARY FUNCTION KRing AS 'com.dot.h3.hive.udf.KRing';
+SELECT KRing('892a100acc7ffff', 9) AS kring;"
++----------------------------------------------+
+|                    kring                     |
++----------------------------------------------+
+| [\"892a100acc7ffff\",\"892a100acc3ffff\",etc.|
++----------------------------------------------+
+```
+
+
+
+### KRing
+
+**Example 1**
+
+```SQL
+CREATE TEMPORARY FUNCTION KRingDistances AS 'com.dot.h3.hive.udf.KRingDistances';
+SELECT KRingDistances(631243922056054783, 9) AS wkt;
++----------------------------------------------------+
+|                        wkt                         |
++----------------------------------------------------+
+| MULTIPOLYGON(((-73.90074702414034 40.86016857340853))
++----------------------------------------------------+
+```
+
+**Example 2**
+
+```SQL
+CREATE TEMPORARY FUNCTION KRingDistances AS 'com.dot.h3.hive.udf.KRingDistances';
+SELECT KRingDistances('8c2a100acc687ff', 9) AS wkt;"
++----------------------------------------------------+
+|                        wkt                         |
++----------------------------------------------------+
+| MULTIPOLYGON(((-73.90074702414034 40.86016857340853))
++----------------------------------------------------+
+```
+
+
+### KRingToWkt
+
+**Example 1**
+
+```SQL
+CREATE TEMPORARY FUNCTION KRingToWkt AS 'com.dot.h3.hive.udf.KRingToWkt';"
+SELECT KRingToWkt(617733123174039551, 9) AS KRingToWkt;"
++----------------------------------------------------+"
+|                     kringtowkt                     |"
++----------------------------------------------------+"
+| [\"POINT(-73.90212095615803 40.86061876224212)\",  |"
++----------------------------------------------------+"
+```
+
+**Example 2**
+
+```SQL
+CREATE TEMPORARY FUNCTION KRingToWkt AS 'com.dot.h3.hive.udf.KRingToWkt';"
+SELECT KRingToWkt('892a100acc7ffff', 9) AS KRingToWkt;"
++----------------------------------------------------+"
+|                     kringtowkt                     |"
++----------------------------------------------------+"
+| [\"POINT(-73.90212095615803 40.86061876224212)\",  |"
++----------------------------------------------------+"
+```
+
+
+
+### LatLongH3ToGeoBoundaryWkt
+
+**Example**
+
+```SQL
+SELECT _FUNC_(40.86016, -73.90071, 12);
+POLYGON((-73.90218697935661 40.862381901482266,-73.9042969767565 40.86144407471913,-73.90423087546569 40.85968095579108,-73.90205493792557 40.858855661723865,-73.89994501590182 40.85979341878112,-73.90001095604163 40.86155653960862))
+--The resolution can be between 0 and 15, 15 is the most granular
+```
+
+
+
+### NumHexagons
+
+**Example**
+
+```SQL
+CREATE TEMPORARY FUNCTION NumHexagons as 'com.dot.h3.hive.udf.NumHexagons';
+SELECT NumHexagons(9) AS num_hexagons;
++---------------+
+| num_hexagons  |
++---------------+
+| 4842432842    |
++---------------+
+```
+
+
+
+### PolyfillToArrayH3Index
+
+**Example**
+
+```SQL
+CREATE TEMPORARY FUNCTION PolyfillToArrayH3Index AS 'com.dot.h3.hive.udf.PolyfillToArrayH3Index';
+SELECT _FUNC_('POLYGON((-71.23094863399959 42.35171702149799,-71.20507841890782 42.39384377360396,-71.18534241583312 42.40583588152941,-71.13489748711537 42.40374196572458,-71.12786523200806 42.3537116038451,-71.23094863399959 42.35171702149799))', null, 9) AS WKT;
+--Returns Array<String> 
+--Can take either NULL, MULTIPOLYGON or POLYGON WKT for the holes_poly_multipoly argument.
+--The resolution can be between 0 and 15, 15 is the most granular
+```
+
+
+
+### PolyfillToArrayWkt
+
+**Example**
+
+```SQL
+CREATE TEMPORARY FUNCTION PolyfillToArrayWkt AS 'com.dot.h3.hive.udf.PolyfillToArrayWkt';
+SELECT PolyfillToArrayWkt('POLYGON((-71.23094863399959 42.35171702149799,-71.20507841890782 42.39384377360396,-71.18534241583312 42.40583588152941,-71.13489748711537 42.40374196572458,-71.12786523200806 42.3537116038451,-71.23094863399959 42.35171702149799))', null, 9) AS WKT;
+--Returns Array<String> 
+--Can take either NULL, MULTIPOLYGON or POLYGON WKT for the holes_poly_multipoly argument.
+--The resolution can be between 0 and 15, 15 is the most granular
+```
+
+
+
+
+
