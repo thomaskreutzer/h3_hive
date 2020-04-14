@@ -279,6 +279,8 @@ SELECT H3ToCenterChildWkt('db768011473333', 13) AS center_child_wkt;"
 
 ### H3ToChildren
 
+**NOTE:** This returns the center point of the index
+
 **Example 1**
 
 ```SQL

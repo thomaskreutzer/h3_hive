@@ -23,7 +23,7 @@ import com.uber.h3core.H3Core;
 @Description(name = "H3ToChildren",
 value = "_FUNC_(long index, integer resolution) - returns long of Children\n "
 + "_FUNC_(string index, integer resolution) - returns string of Children",
-extended = "Returns NULL if any argument is NULL.\n"
+extended = "Returns NULL if any argument is NULL. This returns the center point of the index. \n"
 + "Example:\n"
 + "  > CREATE TEMPORARY FUNCTION H3ToChildren AS 'com.dot.h3.hive.udf.H3ToChildren';\n"
 + "  > SELECT H3ToChildren(599718724986994687, 9) AS children;\n"

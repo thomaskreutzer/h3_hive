@@ -24,7 +24,7 @@ import org.apache.hadoop.io.Text;
 @Description(name = "H3ToChildrenWkt",
 value = "_FUNC_(long index, integer resolution) - returns long of Children\n "
 + "_FUNC_(string index, integer resolution) - returns string of Children",
-extended = "Returns NULL if any argument is NULL.\n"
+extended = "Returns NULL if any argument is NULL. This returns the center point of the index. \n"
 + "Example:\n"
 + "  > CREATE TEMPORARY FUNCTION H3ToChildrenWkt AS 'com.dot.h3.hive.udf.H3ToChildrenWkt';\n"
 + "  > SELECT H3ToChildrenWkt(599718724986994687, 9) AS children;\n"
