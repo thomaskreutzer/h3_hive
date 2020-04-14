@@ -74,7 +74,7 @@ public class LatLongH3ToGeoBoundaryWkt extends GenericUDF {
 		List<GeoCoord> cords = h3.h3ToGeoBoundary( h3.geoToH3(lat, lon, res) );
 		
 		//Add the first GeoCoord in the polygon to be the last GeoCoord to close it properly on a map.
-		cords.add( new GeoCoord( cords.get(0).lng, cords.get(0).lat ) );
+		//cords.add( new GeoCoord( cords.get(0).lng, cords.get(0).lat ) );
 		
 		strOut.set( wkt.geoCoordToPolygonWkt(cords) );
 		return strOut;
