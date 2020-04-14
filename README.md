@@ -149,7 +149,7 @@ SELECT gh3udefh('852a100bfffffff') AS list;"
 
 ### H3Distance
 
-**NOTE:** The indexes must be neighbors for this to work.
+**NOTE:** The indexes should be same size? I had the error as noted below. 
 
 ```SQL
 CREATE TEMPORARY FUNCTION H3Distance AS 'com.dot.h3.hive.udf.H3Distance';
