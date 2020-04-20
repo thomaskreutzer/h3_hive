@@ -31,17 +31,17 @@ public class ExampleEdgeLength {
 		Integer resolution = 12;
 		String lengthUnit = "m";
 
-		IntWritable lengthUnitWritable = new IntWritable(resolution);
+		IntWritable resWritable = new IntWritable(resolution);
 		Text lengthUnitWriteable = new Text(lengthUnit);
 
-		ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lengthUnitWritable);
+		ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, resWritable);
 		ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, lengthUnitWriteable);
 		ObjectInspector[] oiArgs = { valueOI0, valueOI1 };
 
 		udf.initialize(oiArgs);
 
-		DeferredObject valueObj0 = new DeferredJavaObject(new IntWritable(resolution));
-		DeferredObject valueObj1 = new DeferredJavaObject(new Text(lengthUnit));
+		DeferredObject valueObj0 = new DeferredJavaObject(resWritable);
+		DeferredObject valueObj1 = new DeferredJavaObject(lengthUnitWriteable);
 
 		DeferredObject[] doArgs = { valueObj0, valueObj1 };
 

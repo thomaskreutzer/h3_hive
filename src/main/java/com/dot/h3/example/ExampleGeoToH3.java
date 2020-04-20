@@ -28,7 +28,7 @@ public class ExampleGeoToH3 {
 
 		Double lat = 40.803415;
 		Double lng = -73.949194;
-		int res = 13;
+		int res = 9;
 		
 		
 		/*
@@ -41,6 +41,11 @@ public class ExampleGeoToH3 {
 		 * lng = -73.949194;
 		 * res = 13;
 		 * 635747521163695359
+		 * 
+		 * lat = 40.803415;
+		 * lng = -73.949194;
+		 * res = 9;
+		 * output = 617733122654470143
 		 * */
 
 		DoubleWritable dwLat = new DoubleWritable(lat);

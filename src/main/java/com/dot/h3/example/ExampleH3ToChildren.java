@@ -8,51 +8,41 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredObject;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 
 import com.dot.h3.exceptions.H3InstantiationException;
-import com.dot.h3.hive.udf.H3ToString;
+import com.dot.h3.hive.udf.H3ToChildren;
 
-public class ExampleH3ToString {
-	
+public class ExampleH3ToChildren {
+
 	public static void main(String[] args) throws HiveException, IOException, H3InstantiationException {
-		ExampleH3ToString t = new ExampleH3ToString();
+		ExampleH3ToChildren t = new ExampleH3ToChildren();
 		t.testConst();
 	}
 	
 	public void testConst() throws HiveException, IOException, H3InstantiationException {
-
+		
 		// Create Instance of our class
-		H3ToString udf = new H3ToString();
+		H3ToChildren udf = new H3ToChildren();
 		
-		Long l0 = 617733122422996991L;
-		Long l1 = 617733122423259135L;
-		
+		Long l0 = 599718724986994687L;
+		int res = 6;
 		
 		LongWritable lw0 = new LongWritable(l0);
-		LongWritable lw1 = new LongWritable(l1);
+		IntWritable iwRes = new IntWritable(res);
 		
 		ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.longTypeInfo, lw0);
-		ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.longTypeInfo, lw1);
+		ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, iwRes);
 		
+		ObjectInspector[] oiArgs0 = { valueOI0 , valueOI1 };
 		
-		ObjectInspector[] oiArgs0 = { valueOI0 };
-		ObjectInspector[] oiArgs1 = { valueOI1 };
-
-		//Test first call
 		udf.initialize(oiArgs0);
 		DeferredObject valueObj0 = new DeferredJavaObject(lw0);
-		DeferredObject[] doArgs0 = { valueObj0 };
+		DeferredObject valueObj1 = new DeferredJavaObject(iwRes);
+		DeferredObject[] doArgs0 = { valueObj0 , valueObj1 };
 		System.out.println(udf.evaluate(doArgs0));
-		
-		
-		//Test Second call
-		udf.initialize(oiArgs1);
-		DeferredObject valueObj1 = new DeferredJavaObject(lw1);
-		DeferredObject[] doArgs1 = { valueObj1 };
-		System.out.println(udf.evaluate(doArgs1));
 		
 		udf.close();
 	}
-	
 }

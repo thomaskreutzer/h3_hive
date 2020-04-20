@@ -1,14 +1,18 @@
 package com.dot.h3.util;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.uber.h3core.H3Core;
 import com.uber.h3core.util.GeoCoord;
 
 public class WKT {
+	Dedup dedup;
+	
+	public WKT() {
+		dedup=new Dedup();
+		
+	}
 	
 	public String geoCoordToPolygonWkt(List<GeoCoord> gc){
 		StringBuilder builder=new StringBuilder();
@@ -180,16 +184,8 @@ public class WKT {
 				r.add(poly);
 			}
 		}
-		return RemoveDuplicates(r);
+		return dedup.RemoveDupsStr(r);
 	}
-	
-	private ArrayList<String> RemoveDuplicates(ArrayList<String> data){
-		Set<String> primesWithoutDuplicates = new LinkedHashSet<String>(data);
-		data.clear();
-		data.addAll(primesWithoutDuplicates);
-		return data;
-	}
-	
 	
 	private List<String> cleanPolygonsArr(String[] polygon) {
 		List<String> r = new ArrayList<String>();

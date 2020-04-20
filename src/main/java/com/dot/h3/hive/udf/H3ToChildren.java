@@ -18,6 +18,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 
 import com.dot.h3.exceptions.H3InstantiationException;
+import com.dot.h3.util.Dedup;
 import com.uber.h3core.H3Core;
 
 @Description(name = "H3ToChildren",
@@ -50,10 +51,12 @@ public class H3ToChildren extends GenericUDF {
 	PrimitiveObjectInspector inputOI0;
 	PrimitiveObjectInspector inputOI1;
 	H3Core h3;
+	Dedup dedup;
 	
 	public H3ToChildren() throws H3InstantiationException {
 		try {
 			h3 = H3Core.newInstance();
+			dedup = new Dedup();
 		} catch (IOException e) {
 			throw new H3InstantiationException("Could not instantiate the H3 core library");
 		}
@@ -100,14 +103,14 @@ public class H3ToChildren extends GenericUDF {
 			for(int i=0; i < indexStrArr.size(); i++) {
 				resultText.add( new Text(indexStrArr.get(i)) );
 			}
-			return resultText;
+			return dedup.RemoveDupsText(resultText);
 		} else {
 			Long indexL = (Long) inputOI0.getPrimitiveJavaObject(arg0);
 			indexLongArr = h3.h3ToChildren(indexL,res);
 			for (int x = 0; x < indexLongArr.size(); x++) {
 				resultLong.add( new LongWritable(indexLongArr.get(x)) );
 			}
-			return resultLong;
+			return dedup.RemoveDupsLongWritable(resultLong);
 		}
 	}
 

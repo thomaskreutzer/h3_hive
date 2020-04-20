@@ -43,9 +43,9 @@ public class ExamplePolyfillToArrayH3Index {
 		ObjectInspector[] oiArgs0 = { valueOI0, valueOI1, valueOI2 };
 		//Test first call
 		udf.initialize(oiArgs0);
-		DeferredObject valueObj0 = new DeferredJavaObject(new Text(poly));
+		DeferredObject valueObj0 = new DeferredJavaObject(poly);
 		DeferredObject valueObj1 = new DeferredJavaObject(null);
-		DeferredObject valueObj2 = new DeferredJavaObject(new IntWritable(res));
+		DeferredObject valueObj2 = new DeferredJavaObject(iwRes);
 		DeferredObject[] doArgs0 = { valueObj0, valueObj1, valueObj2 };
 		System.out.println(udf.evaluate(doArgs0));
 

@@ -16,6 +16,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 
 import com.dot.h3.exceptions.H3InstantiationException;
+import com.dot.h3.util.Dedup;
 import com.dot.h3.util.WKT;
 import com.uber.h3core.H3Core;
 
@@ -49,11 +50,13 @@ public class H3ToChildrenWkt extends GenericUDF {
 	PrimitiveObjectInspector inputOI1;
 	H3Core h3;
 	WKT wkt;
+	Dedup dedup;
 	
 	public H3ToChildrenWkt() throws H3InstantiationException {
 		wkt = new WKT();
 		try {
 			h3 = H3Core.newInstance();
+			dedup = new Dedup();
 		} catch (IOException e) {
 			throw new H3InstantiationException("Could not instantiate the H3 core library");
 		}
@@ -98,7 +101,7 @@ public class H3ToChildrenWkt extends GenericUDF {
 				strOut.set( wktPoint );
 				resultText.add( strOut );
 			}
-			return resultText;
+			return dedup.RemoveDupsText(resultText);
 		} else {
 			Long indexL = (Long) inputOI0.getPrimitiveJavaObject(arg0);
 			indexLongArr = h3.h3ToChildren(indexL,res);
@@ -108,8 +111,8 @@ public class H3ToChildrenWkt extends GenericUDF {
 				strOut.set( wktPoint );
 				resultText.add( strOut );
 			}
+			return dedup.RemoveDupsText(resultText);
 		}
-		return resultText;
 	}
 
 	@Override
