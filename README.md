@@ -251,7 +251,6 @@ SELECT H3ToCenterChild('db768011473333', 13) AS center_child;
 
 ### H3ToCenterChildWkt
 
-This is also having duplicates created and needs to be fixed in the future TODO
 
 **Example 1**
 
@@ -281,7 +280,6 @@ SELECT H3ToCenterChildWkt('db768011473333', 13) AS center_child_wkt;"
 ### H3ToChildren
 
 **NOTE:** This returns the center point of the index
-This is also having duplicates created and needs to be fixed in the future TODO
 
 **Example 1**
 
