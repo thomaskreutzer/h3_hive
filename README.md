@@ -627,7 +627,7 @@ SELECT PolyfillToArrayWkt('POLYGON((-71.23094863399959 42.35171702149799,-71.205
 
 1. ESRI is also used and must be installed, permanent functions have already been created for ESRI.
 2. You have loaded a table with breadcrumb data
-3. You have loaded a table with the New York City tlc zones ()
+3. You have loaded a table with the New York City tlc zones, similar to the following (https://catalog.data.gov/dataset/nyc-taxi-zones)
 
 ### Breadcrumbs NYC
 
