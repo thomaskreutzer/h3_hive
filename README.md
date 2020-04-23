@@ -621,3 +621,83 @@ SELECT PolyfillToArrayWkt('POLYGON((-71.23094863399959 42.35171702149799,-71.205
 
 
 
+## Usage Examples
+
+### Assumptions
+
+1. ESRI is also used and must be installed, permanent functions have already been created for ESRI.
+2. You have loaded a table with breadcrumb data
+3. You have loaded a table with the New York City tlc zones ()
+
+### Breadcrumbs NYC
+
+**NOTE:** This example uses sudo code as an example. The real tables and columns have been changed from our system. 
+
+
+This is however an example of a working query, the table has been partitioned in Hive by a column called ym for the current year and month.
+
+
+
+
+ 
+ ```SQL
+USE sample_data;
+SET tez.queue.name=big;
+CREATE TEMPORARY FUNCTION geotoh3 as 'com.dot.h3.hive.udf.GeoToH3';
+CREATE TEMPORARY FUNCTION polyfilltoarrayh3index as 'com.dot.h3.hive.udf.PolyfillToArrayH3Index';
+CREATE TEMPORARY FUNCTION H3ToGeoBoundaryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundaryWkt';
+
+SET hivevar:RESOLUTION=10;
+
+with geomtab AS (
+  SELECT
+    st_astext(ST_GeomFromText(geometry)) as geometry
+  FROM tlc_zones
+  WHERE
+    geometry rlike 'MULTI.*' = false
+),
+geom_array AS (
+  SELECT
+    polyfilltoarrayh3index(geomtab.geometry, NULL, 10) AS `hexid`
+  FROM
+   geomtab
+),
+bread AS (
+  SELECT
+    bc_id
+    , bc_timestamp
+    , cast(geotoh3(vehicle_lat,vehicle_long, 10) as BIGINT ) AS `hexid`
+  FROM city_breadcrumbs
+  WHERE
+    yearmonth = 201911
+),
+flattened_geom_array AS (
+  SELECT
+    DISTINCT CAST(poly_hexid AS BIGINT) AS poly_hexid
+  FROM geom_array lateral view explode(hexid) geom_array as `poly_hexid`
+),
+preout AS (
+  SELECT
+    bread.*
+    , flattened_geom_array.poly_hexid
+    , H3ToGeoBoundaryWkt(cast(flattened_geom_array.poly_hexid as bigint)) AS `wkt`
+  FROM
+   flattened_geom_array, bread
+ WHERE
+   bread.hexid = flattened_geom_array.poly_hexid
+
+)
+
+SELECT
+  count(*)
+  , poly_hexid
+  , wkt
+FROM preout
+GROUP BY
+  poly_hexid, wkt;
+```
+
+
+This data added to QGIS
+[Imgur](https://imgur.com/GJ6MKPB)
+
