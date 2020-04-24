@@ -710,13 +710,12 @@ Next we take a look at a single zone and execute at a higher resolution.
  
 ```SQL
 
-USE transportation_data;
-SET tez.queue.name=production;
+USE my_db;
+SET tez.queue.name=big;
 CREATE TEMPORARY FUNCTION geotoh3 as 'com.dot.h3.hive.udf.GeoToH3';
 CREATE TEMPORARY FUNCTION polyfilltoarrayh3index as 'com.dot.h3.hive.udf.PolyfillToArrayH3Index';
 CREATE TEMPORARY FUNCTION H3ToGeoBoundaryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundaryWkt';
 set hivevar:RESOLUTION=15;
-set hivevar:BREADCRUMB_TABLE='uber_breadcrumb';
 set hivevar:LOCATIONID=142;
  
 with geomtab AS (
