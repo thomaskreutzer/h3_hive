@@ -778,7 +778,7 @@ Another function could possibly provide the ability to extend slightly beyond th
 ###Kring
  
 The Kring function takes an index +  resolution and finds all the neighbors around it in a ring.
-To investigate further let’s look at the index 635747521119807551 as seen below highlighted in green.
+To investigate further let's look at the index 635747521119807551 as seen below highlighted in green.
  
 ![Single Index](https://i.imgur.com/9hAjCk6.png)
  
