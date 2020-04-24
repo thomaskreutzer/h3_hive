@@ -787,8 +787,8 @@ Method used to create the KRing round this index:
 **NOTE:** resolution is 1
  
 ```SQL
-USE transportation_data;
-SET tez.queue.name=production;
+USE my_db;
+SET tez.queue.name=big;
 CREATE TEMPORARY FUNCTION KRing AS 'com.dot.h3.hive.udf.KRing';
  
 with geom_array AS (
@@ -820,8 +820,8 @@ Next we will take this Kring functionality back to the query we used on the zone
 Adding Kring into the query does add some additional overhead and time to execute.
  
 ```SQL
-USE transportation_data;
-SET tez.queue.name=production;
+USE my_db;
+SET tez.queue.name=big;
 CREATE TEMPORARY FUNCTION geotoh3 as 'com.dot.h3.hive.udf.GeoToH3';
 CREATE TEMPORARY FUNCTION polyfilltoarrayh3index as 'com.dot.h3.hive.udf.PolyfillToArrayH3Index';
 CREATE TEMPORARY FUNCTION H3ToGeoBoundaryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundaryWkt';
