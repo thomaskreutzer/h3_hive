@@ -540,7 +540,7 @@ SELECT KRingDistances('8c2a100acc687ff', 9) AS wkt;"
 **Example 1**
 
 ```SQL
-CREATE TEMPORARY FUNCTION KRingToWkt AS 'com.dot.h3.hive.udf.KRingToWkt';"
+CREATE TEMPORARY FUNCTION KRingToWkt AS 'com.dot.h3.hive.udf.KRingToWkt';
 SELECT KRingToWkt(617733123174039551, 9) AS KRingToWkt;"
 +----------------------------------------------------+"
 |                     kringtowkt                     |"
@@ -552,7 +552,7 @@ SELECT KRingToWkt(617733123174039551, 9) AS KRingToWkt;"
 **Example 2**
 
 ```SQL
-CREATE TEMPORARY FUNCTION KRingToWkt AS 'com.dot.h3.hive.udf.KRingToWkt';"
+CREATE TEMPORARY FUNCTION KRingToWkt AS 'com.dot.h3.hive.udf.KRingToWkt';
 SELECT KRingToWkt('892a100acc7ffff', 9) AS KRingToWkt;"
 +----------------------------------------------------+"
 |                     kringtowkt                     |"
@@ -626,13 +626,15 @@ SELECT PolyfillToArrayWkt('POLYGON((-71.23094863399959 42.35171702149799,-71.205
 ### Assumptions
 
 1. ESRI is also used and must be installed, permanent functions have already been created for ESRI.
-2. You have loaded a table with breadcrumb data
+2. You have loaded a table with breadcrumb data.
 3. You have loaded a table with the New York City tlc zones, similar to the following (https://catalog.data.gov/dataset/nyc-taxi-zones)
 
 ### Breadcrumbs NYC
 
 **NOTE:** This example uses sudo code as an example. The real tables and columns have been changed from our system. 
+**NOTE:** The distinct in the query is to limit the index's on the flattening of the array where we have overlap between zones.
 
+This has proven to significantly increase the performance of the query. If you are querying on a single zone the distinct would not be required.
 
 This is however an example of a working query, the table has been partitioned in Hive by a column called ym for the current year and month.
 
@@ -669,7 +671,7 @@ bread AS (
     , cast(geotoh3(vehicle_lat,vehicle_long, 10) as BIGINT ) AS `hexid`
   FROM city_breadcrumbs
   WHERE
-    yearmonth = 201911
+    ym = 201911
 ),
 flattened_geom_array AS (
   SELECT
@@ -701,3 +703,250 @@ GROUP BY
 This data added to QGIS
 ![Nyc Breadcrumbs Resolution 10](https://imgur.com/GJ6MKPB.png)
 
+
+### Breadcrumbs by zone
+ 
+Next we take a look at a single zone and execute at a higher resolution.
+ 
+```SQL
+
+USE transportation_data;
+SET tez.queue.name=production;
+CREATE TEMPORARY FUNCTION geotoh3 as 'com.dot.h3.hive.udf.GeoToH3';
+CREATE TEMPORARY FUNCTION polyfilltoarrayh3index as 'com.dot.h3.hive.udf.PolyfillToArrayH3Index';
+CREATE TEMPORARY FUNCTION H3ToGeoBoundaryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundaryWkt';
+set hivevar:RESOLUTION=15;
+set hivevar:BREADCRUMB_TABLE='uber_breadcrumb';
+set hivevar:LOCATIONID=142;
+ 
+with geomtab AS (
+  SELECT
+    st_astext(ST_GeomFromText(geometry)) as geometry
+  FROM tlc_zones
+  WHERE
+    geometry rlike 'MULTI.*' = false
+    AND locationid = ${LOCATIONID}
+),
+geom_array AS (
+  SELECT
+    polyfilltoarrayh3index(geomtab.geometry, NULL, ${RESOLUTION}) AS `hexid`
+  FROM
+   geomtab
+),
+bread AS (
+  SELECT
+    bc_id
+    ,bc_timestamp
+    ,cast(geotoh3(vehicle_lat,vehicle_long, ${RESOLUTION}) as BIGINT ) AS `hexid`
+  FROM city_breadcrumbs
+  WHERE
+    ym = 201911
+),
+flattened_geom_array AS (
+  SELECT
+    DISTINCT CAST(poly_hexid AS BIGINT) AS poly_hexid
+  FROM geom_array lateral view explode(hexid) geom_array as `poly_hexid`
+),
+preout AS (
+  SELECT
+    bread.*
+    , flattened_geom_array.poly_hexid
+    , H3ToGeoBoundaryWkt(cast(flattened_geom_array.poly_hexid as bigint)) AS `wkt`
+  FROM
+   flattened_geom_array, bread
+WHERE
+   bread.hexid = flattened_geom_array.poly_hexid
+)
+SELECT
+  count(*) total
+  , poly_hexid
+  , wkt
+FROM preout
+GROUP BY
+  poly_hexid, wkt;
+```
+ 
+The output looks as follows in QGIS
+ 
+![Single Zone resolution 13](https://i.imgur.com/7y6wTcz.png)
+ 
+Taking a closer look at the results you can see that PolyfillToArrayH3Index will not perfectly conform to the boundary and is expected. In some cases this is along a street.
+ 
+![Border](https://i.imgur.com/tBWeQ4q.png)
+ 
+Another function could possibly provide the ability to extend slightly beyond the boundary created with the PolyfillToArrayH3Index function.
+ 
+###Kring
+ 
+The Kring function takes an index +  resolution and finds all the neighbors around it in a ring.
+To investigate further let’s look at the index 635747521119807551 as seen below highlighted in green.
+ 
+![Single Index](https://i.imgur.com/9hAjCk6.png)
+ 
+Method used to create the KRing round this index:
+
+**NOTE:** resolution is 1
+ 
+```SQL
+USE transportation_data;
+SET tez.queue.name=production;
+CREATE TEMPORARY FUNCTION KRing AS 'com.dot.h3.hive.udf.KRing';
+ 
+with geom_array AS (
+  SELECT KRing(635747521119807551, 1) AS `hexid`
+),
+flattened_geom_array AS (
+  SELECT
+    DISTINCT CAST(poly_hexid AS BIGINT) AS poly_hexid
+  FROM geom_array lateral view explode(hexid) geom_array as `poly_hexid`
+)
+,
+preout AS (
+  SELECT
+    flattened_geom_array.poly_hexid
+    ,H3ToGeoBoundaryWkt(cast(flattened_geom_array.poly_hexid as bigint)) AS `wkt`
+  FROM
+   flattened_geom_array
+)
+SELECT * FROM preout;
+```
+ 
+**Result in QGIS:**
+ 
+![KRing Example](https://i.imgur.com/0u81KDc.png)
+ 
+Next we will take this Kring functionality back to the query we used on the zone in order to pull in extra information.
+ 
+**NOTE:** Again we are using a distinct here to limit the number of indexes as the Kring will create duplicates.
+Adding Kring into the query does add some additional overhead and time to execute.
+ 
+```SQL
+USE transportation_data;
+SET tez.queue.name=production;
+CREATE TEMPORARY FUNCTION geotoh3 as 'com.dot.h3.hive.udf.GeoToH3';
+CREATE TEMPORARY FUNCTION polyfilltoarrayh3index as 'com.dot.h3.hive.udf.PolyfillToArrayH3Index';
+CREATE TEMPORARY FUNCTION H3ToGeoBoundaryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundaryWkt';
+CREATE TEMPORARY FUNCTION KRing AS 'com.dot.h3.hive.udf.KRing';
+ 
+with geomtab AS (
+  SELECT
+    st_astext(ST_GeomFromText(geometry)) as geometry
+  FROM tlc_zones
+  WHERE
+    AND locationid = 142
+),
+geom_array AS (
+  SELECT
+    polyfilltoarrayh3index(geomtab.geometry, NULL, 13) AS `hexid`
+  FROM
+   geomtab
+),
+flattened_geom_array AS (
+  SELECT
+    DISTINCT CAST(poly_hexid AS BIGINT) AS poly_hexid
+  FROM geom_array lateral view explode(hexid) geom_array as `poly_hexid`
+),
+kring_arrays AS (
+  SELECT
+    KRing(poly_hexid, 1) AS `hexid`
+  FROM flattened_geom_array
+),
+flatten_kring AS(
+  SELECT
+    DISTINCT CAST(poly_hexid AS BIGINT) AS poly_hexid
+  FROM kring_arrays lateral view explode(hexid) kring_arrays as `poly_hexid`
+),
+
+bread AS (
+  SELECT
+    bc_id
+    ,bc_timestamp
+    ,cast(geotoh3(vehicle_lat,vehicle_long, 13) as BIGINT ) AS `hexid`
+  FROM city_breadcrumbs
+  WHERE
+    ym = 201911
+),
+preout AS (
+  SELECT
+    bread.*
+    , flatten_kring.poly_hexid
+    , H3ToGeoBoundaryWkt(cast(flatten_kring.poly_hexid as bigint)) AS `wkt`
+  FROM
+   flatten_kring, bread
+ WHERE
+   bread.hexid = flatten_kring.poly_hexid
+)
+SELECT
+  count(*) total
+  , poly_hexid
+  , wkt
+FROM preout
+GROUP BY
+  poly_hexid, wkt;
+```
+ 
+Comparing the results, we can see that we now have overlap with the boundary that we did not prior. It would be up to the Analyst to decide if they want to add this for their specific use case. With resolution set to 1 for Kring you will pull in all neighbors and not only would there be overlap but you would pull in data from the other zones. Related to your polygon resolution, the higher the resolution the more accurate with a hit to performance. However, it is likely that a single zone at resolution 15 is going to run pretty quickly, our example is at resolution 13.
+
+
+![Kring Compare](https://i.imgur.com/13SmEYI.png)
+
+### Exploring H3ToChildren
+
+We will continue to explore with the index 635747521119807551 which is derived from the resolution 13. Execution of the following query will give us the children at the finest resolution of 15.
+
+
+```SQL
+CREATE TEMPORARY FUNCTION H3ToChildrenWkt AS 'com.dot.h3.hive.udf.H3ToChildrenWkt';
+ 
+with children_array AS (
+  SELECT H3ToChildrenWkt( CAST(635747521119807551 AS BIGINT), 15) AS wkt_arr
+),
+flattened_children_array AS (
+  SELECT
+    DISTINCT point
+  FROM children_array lateral view explode(wkt_arr) children_array as `point`
+)
+
+SELECT point FROM flattened_children_array;
+``` 
+
+The output displays as the yellow dots in QGIS
+
+
+![H3ToChildren](https://i.imgur.com/PNZ1f8o.png) 
+
+Next we will plot out the children polygons inside the index 635747521119807551.
+
+In order to do so, we are using several hive functions and h3 functions together to translate the data. Perhaps in the future I will build a function in Java that handles most of this work for us.
+
+ 
+```SQL
+CREATE TEMPORARY FUNCTION GeoToH3 AS 'com.dot.h3.hive.udf.GeoToH3';
+CREATE TEMPORARY FUNCTION H3ToChildrenWkt AS 'com.dot.h3.hive.udf.H3ToChildrenWkt';
+CREATE TEMPORARY FUNCTION H3SetToMultiPolygon AS 'com.dot.h3.hive.udf.H3SetToMultiPolygon';
+CREATE TEMPORARY FUNCTION H3ToGeoBoundaryWkt AS 'com.dot.h3.hive.udf.H3ToGeoBoundaryWkt';
+ 
+with children_array AS (
+  SELECT H3ToChildrenWkt( CAST(635747521119807551 AS BIGINT), 15) AS wkt_arr
+),
+flattened_children_array AS (
+  SELECT
+    DISTINCT point
+  FROM children_array lateral view explode(wkt_arr) children_array as `point`
+)
+ 
+SELECT
+    H3ToGeoBoundaryWkt(
+      GeoToH3(
+        CAST( split(translate(translate(point, 'POINT(', '') , ')', ''), ' ')[1] AS DOUBLE ) --LAT
+        ,CAST( split(translate(translate(point, 'POINT(', '') , ')', ''), ' ')[0] AS DOUBLE )  --LNG
+        ,15
+      )
+    ) AS poly
+FROM flattened_children_array;
+
+```
+
+ 
+
+![H3ToChildrenWkt to GeoBoundary](https://i.imgur.com/OnorR95.png)
