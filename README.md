@@ -949,3 +949,15 @@ FROM flattened_children_array;
  
 
 ![H3ToChildrenWkt to GeoBoundary](https://i.imgur.com/OnorR95.png)
+
+
+
+#Building
+
+## Finding your versions
+
+If you need to update your POM with a different version of HDP
+
+https://repo.hortonworks.com/content/groups/public/org/apache/hive/hive-exec/
+https://repo.hortonworks.com/content/groups/public/org/apache/hadoop/hadoop-client/
+
