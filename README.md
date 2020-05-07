@@ -961,3 +961,201 @@ If you need to update your POM with a different version of HDP
 https://repo.hortonworks.com/content/groups/public/org/apache/hive/hive-exec/
 https://repo.hortonworks.com/content/groups/public/org/apache/hadoop/hadoop-client/
 
+
+
+
+## Analyst Query Conversion
+
+For the next example we used a query performed by one of the analysts using ESRI and converted the query to use Uber H3 in place of the original boundary. 
+
+**NOTE:** I forced the number of mappers to increase artificially, according to the following article it is also not the recommended method. 
+However, the method's mentioned in the article were not yielding results and they have for me in the past on different queries. 
+This is a very good article and it should be further investigated. 
+
+https://community.cloudera.com/t5/Community-Articles/Hive-on-Tez-Performance-Tuning-Determining-Reducer-Counts/ta-p/245680
+
+
+**Original Analyst Query**
+```SQL
+CREATE TEMPORARY TABLE IF NOT exists all_rows AS
+SELECT
+  d.*, (distance_meter/time_dif_sec)*2.23694 AS ind_speed --meter/second to mph
+FROM
+(
+  SELECT
+    c.*
+    , unix_timestamp(tpep_datetime)-unix_timestamp(lag_datetime) AS time_dif_sec
+    , ST_GeodesicLengthWGS84(ST_SetSRID(ST_Linestring(longitude,latitude, lag_longitude,lag_latitude), 4326)) AS distance_meter
+  FROM
+  (
+    SELECT
+      b.*
+      , lag(tpep_datetime) over (partition by year, month, day, hour, medallion, hack_number order by tpep_datetime asc) as lag_datetime
+      , lag(geometry) over (partition by year, month, day, hour, medallion, hack_number order by tpep_datetime asc) as lag_geometry
+      , lag(longitude) over (partition by year, month, day, hour, medallion, hack_number order by tpep_datetime asc) as lag_longitude
+      , lag(latitude) over (partition by year, month, day, hour, medallion, hack_number order by tpep_datetime asc) as lag_latitude
+    FROM 
+    (
+      SELECT
+        a.*
+        , rank() over (partition by year, month, day, hour, medallion, hack_number order by tpep_datetime asc) AS rank1 
+      FROM 
+      (
+        SELECT
+          bread.medallion
+          , bread.hack_number
+          , bread.type
+          , bread.vendor
+          , bread.trip_number
+          , bread.cruise
+          , bread.tpep_datetime
+          , bread.geometry
+          , bread.longitude
+          , bread.latitude
+          , year(bread.tpep_datetime) AS `YEAR`
+          , month(bread.tpep_datetime) AS `MONTH`
+          , day(bread.tpep_datetime) AS `DAY`
+          , hour(bread.tpep_datetime) AS `HOUR`
+        FROM bread,default.my_custom_shapefile
+        WHERE
+          st_contains(my_custom_shapefile.geom, bread.geometry)
+          AND bread.yearmonth = 201812
+          AND bread.cruise=0
+      ) AS a
+    ) AS b
+  ) as c 
+  WHERE
+    rank1>1 
+    AND lag_datetime IS NOT NULL 
+    AND lag_geometry IS NOT NULL
+) AS d
+WHERE 
+  time_dif_sec IS NOT NULL 
+  AND time_dif_sec>0 
+  AND time_dif_sec<180;
+SELECT COUNT(*) FROM (
+SELECT all_rows.year, all_rows.month, all_rows.hour,cast((sum(all_rows.time_dif_sec)/3600) as double precision) AS vht,sum(all_rows.distance_meter)*0.000621371 AS vmt, 
+       cast(((sum(all_rows.distance_meter)*0.000621371)/(sum(all_rows.time_dif_sec)/3600)) as double precision) AS MFD_speed, Avg(all_rows.ind_speed) AS mean_speed,
+       percentile_approx(all_rows.ind_speed, 0.5) AS median_speed, count(all_rows.medallion) AS sample_size
+FROM all_rows
+GROUP BY year, month,day, hour
+ORDER BY year, month,day, hour
+); 
+drop table all_rows;
+```
+
+
+**Updated Analyst Query - Uber H3**
+
+```SQL
+USE transportation_data;
+SET tez.queue.name=production;
+SET mapred.reduce.tasks=120;
+with geomtab AS (
+ SELECT
+   st_astext(ST_GeomFromText(geom)) as geometry
+ FROM default.my_custom_shapefile
+),
+geom_array AS (
+  SELECT
+    polyfilltoarrayh3index(geomtab.geometry, NULL, 13) AS `hexid` 
+  FROM
+   geomtab
+),
+flattened_geom_array AS (
+  SELECT
+    DISTINCT CAST(poly_hexid AS BIGINT) AS poly_hexid 
+  FROM geom_array lateral view explode(hexid) geom_array as `poly_hexid`
+),
+bread AS (
+    SELECT
+      bread.medallion
+      , hack_number
+      , type
+      , vendor
+      , trip_number
+      , cruise
+      , tpep_datetime
+      , geometry
+      , longitude
+      , latitude
+      , year(tpep_datetime) AS `YEAR`
+      , month(tpep_datetime) AS `MONTH`
+      , day(tpep_datetime) AS `DAY`
+      , hour(tpep_datetime) AS `HOUR`
+      , cast(geotoh3(latitude,longitude, 13) as BIGINT ) AS `hexid`
+    FROM
+      bread
+    WHERE
+      bread.yearmonth = 201812
+      AND bread.cruise=0
+),
+spatial_join AS (
+  SELECT
+    bread.*
+    , flattened_geom_array.poly_hexid
+    , H3ToGeoBoundaryWkt(cast(flattened_geom_array.poly_hexid as bigint)) AS `wkt` 
+  FROM
+   flattened_geom_array, bread 
+ WHERE
+   bread.hexid = flattened_geom_array.poly_hexid
+),
+all_rows AS (
+  SELECT
+    d.*, (distance_meter/time_dif_sec)*2.23694 AS ind_speed --meter/second to mph
+  FROM
+  (
+    SELECT
+      c.*
+      , unix_timestamp(tpep_datetime)-unix_timestamp(lag_datetime) AS time_dif_sec
+      , ST_GeodesicLengthWGS84(ST_SetSRID(ST_Linestring(longitude,latitude, lag_longitude,lag_latitude), 4326)) AS distance_meter
+    FROM
+    (
+      SELECT
+        b.*
+        , lag(tpep_datetime) over (partition by year, month, day, hour, medallion, hack_number order by tpep_datetime asc) as lag_datetime
+        , lag(geometry) over (partition by year, month, day, hour, medallion, hack_number order by tpep_datetime asc) as lag_geometry
+        , lag(longitude) over (partition by year, month, day, hour, medallion, hack_number order by tpep_datetime asc) as lag_longitude
+        , lag(latitude) over (partition by year, month, day, hour, medallion, hack_number order by tpep_datetime asc) as lag_latitude
+      FROM 
+      (
+        SELECT
+          a.*
+          , rank() over (partition by year, month, day, hour, medallion, hack_number order by tpep_datetime asc) AS rank1 
+        FROM 
+        (  
+          SELECT * FROM spatial_join
+        ) AS a
+      ) AS b
+    ) as c 
+    WHERE
+      rank1>1 
+      AND lag_datetime IS NOT NULL 
+      AND lag_geometry IS NOT NULL
+  ) AS d
+  WHERE 
+    time_dif_sec IS NOT NULL 
+    AND time_dif_sec>0 
+    AND time_dif_sec<180
+)
+SELECT COUNT(*) FROM (
+SELECT
+  `year`
+  , `month`
+  , `hour`
+  , `day`
+  ,cast((sum(all_rows.time_dif_sec)/3600) as double precision) AS vht
+  ,sum(all_rows.distance_meter)*0.000621371 AS vmt
+  ,cast(((sum(all_rows.distance_meter)*0.000621371)/(sum(all_rows.time_dif_sec)/3600)) as double precision) AS MFD_speed
+  ,Avg(all_rows.ind_speed) AS mean_speed
+  ,percentile_approx(all_rows.ind_speed, 0.5) AS median_speed
+  , count(all_rows.medallion) AS sample_size
+FROM all_rows
+GROUP BY
+  year
+  , month
+  , day
+  , hour
+) P
+;
+```
