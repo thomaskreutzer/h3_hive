@@ -62,7 +62,7 @@ SELECT _FUNC_(12, 'm') AS edge_meters;
 
 ```SQL
 CREATE TEMPORARY FUNCTION GeoToH3 AS 'com.dot.h3.hive.udf.GeoToH3';
-SELECT GeoToH3(40.86016, -73.90071, 12) AS index;
+SELECT GeoToH3(CAST(40.86016 AS DOUBLE), CAST(-73.90071 AS DOUBLE), 12) AS index;
 +---------------------+
 |        index        |
 +---------------------+
@@ -74,7 +74,7 @@ SELECT GeoToH3(40.86016, -73.90071, 12) AS index;
 
 ```SQL
 CREATE TEMPORARY FUNCTION GeoToH3Address AS 'com.dot.h3.hive.udf.GeoToH3Address';
-SELECT GeoToH3Address(40.86016, -73.90071, 12) AS index;
+SELECT GeoToH3Address(CAST(40.86016 AS DOUBLE), CAST(-73.90071 AS DOUBLE), 12) AS index;
 +------------------+
 |      index       |
 +------------------+
